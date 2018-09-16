@@ -108,7 +108,12 @@ describe("CRUD Action Types", () => {
     });
   });
 
-  describe("The object returned by the factory function must have an extend method used during model instantiation", function() {});
+  describe("The object returned by the factory function must have an extend method used during model instantiation", function() {
+    it("The returned object has an extend method", () => {
+      let actionTypes = actionTypesFactory();
+      assert.equal(typeof actionTypes.extend, "function");
+    });
+  });
 
   describe("The object returned by the factory function must have an extendFactory method used for creating unique system defaults for this layer", function() {});
 });

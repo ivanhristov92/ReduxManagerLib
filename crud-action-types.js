@@ -1,7 +1,11 @@
 import * as _ from "ramda";
 
 export default function actionTypesFactory(modelName) {
-  let actionTypes = {
+  const addModelName = _.map(actionTypeValue => {
+    return `${modelName}/${actionTypeValue}`;
+  });
+
+  let actionTypes = addModelName({
     CREATE: "CREATE",
     CREATE__SUCCESS: "CREATE__SUCCESS",
     CREATE__FAILURE: "CREATE__FAILURE",
@@ -14,9 +18,13 @@ export default function actionTypesFactory(modelName) {
     DELETE: "DELETE",
     DELETE__SUCCESS: "DELETE__SUCCESS",
     DELETE__FAILURE: "DELETE__FAILURE"
+  });
+
+  const extendFunctionality = {
+    extend: function() {
+      console.log("HIII");
+    }
   };
 
-  return _.map(actionTypeValue => {
-    return `${modelName}/${actionTypeValue}`;
-  }, actionTypes);
+  return Object.assign(Object.create(extendFunctionality), actionTypes);
 }
