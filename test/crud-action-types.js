@@ -113,6 +113,36 @@ describe("CRUD Action Types", () => {
       let actionTypes = actionTypesFactory();
       assert.equal(typeof actionTypes.extend, "function");
     });
+
+    it("The 'extend' method returns an object", () => {
+      let actionTypes = actionTypesFactory();
+      let extendedActionTypes = actionTypes.extend({ TEST_TYPE: "TEST_TYPE" });
+      assert.equal(typeof extendedActionTypes, "object");
+    });
+
+    it("The 'extend' method adds new action types to the object", () => {
+      let actionTypes = actionTypesFactory();
+      let extendedActionTypes = actionTypes.extend({ TEST_TYPE: "TEST_TYPE" });
+      assert.equal(_.has("TEST_TYPE", extendedActionTypes), true);
+    });
+    it("The 'extend' method does not modify the original object", () => {
+      let actionTypes = actionTypesFactory();
+      let actionTypesBackup = actionTypesFactory();
+      actionTypes.extend({ TEST_TYPE: "TEST_TYPE" });
+      assert.deepEqual(actionTypes, actionTypesBackup);
+    });
+
+    it("The 'extend' method accepts an object only and THROWS otherwise", () => {
+      let actionTypes = actionTypesFactory();
+
+      assert.throws(function testNonObjects() {
+        actionTypes.extend(undefined);
+        actionTypes.extend(null);
+        actionTypes.extend(10);
+        actionTypes.extend(false);
+        actionTypes.extend([]);
+      }, Error);
+    });
   });
 
   describe("The object returned by the factory function must have an extendFactory method used for creating unique system defaults for this layer", function() {});
