@@ -19,22 +19,21 @@ export default function actionTypesFactory(modelName) {
     DELETE__SUCCESS: "DELETE__SUCCESS",
     DELETE__FAILURE: "DELETE__FAILURE"
   });
-
-  const createExtendableActionTypes = () => {
-    return Object.assign(Object.create(extendFunctionalityProto), actionTypes);
-  };
-
-  const extendFunctionalityProto = {
-    extend: function(additionalActionTypes = {}) {
-      if (typeof additionalActionTypes !== "object") {
-        throw new TypeError(
-          "Expected and object, but received " + typeof additionalActionTypes
-        );
+  function createExtendableActionTypes() {
+    const extendFunctionalityProto = {
+      extend: function extendActionTypes(additionalActionTypes = {}) {
+        if (typeof additionalActionTypes !== "object") {
+          throw new TypeError(
+            "Expected and object, but received " + typeof additionalActionTypes
+          );
+        }
+        let extendableActionTypes = createExtendableActionTypes();
+        return Object.assign(extendableActionTypes, additionalActionTypes);
       }
-      let extendableActionTypes = createExtendableActionTypes();
-      return Object.assign(extendableActionTypes, additionalActionTypes);
-    }
-  };
+    };
+
+    return Object.assign(Object.create(extendFunctionalityProto), actionTypes);
+  }
 
   return createExtendableActionTypes();
 }

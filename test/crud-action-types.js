@@ -106,7 +106,7 @@ describe("CRUD Action Types", () => {
         });
       });
     });
-  });
+
 
   describe("The object returned by the factory function must have an extend method used during model instantiation", function() {
     it("The returned object has an extend method", () => {
