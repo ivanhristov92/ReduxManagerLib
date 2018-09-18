@@ -7,6 +7,7 @@
 
 import actionCreatorsFactory from "../crud-action-creators";
 var assert = require("assert");
+var sinon = require("sinon");
 import * as _ from "ramda";
 
 describe("CRUD Action Creators", () => {
@@ -16,14 +17,34 @@ describe("CRUD Action Creators", () => {
     });
   });
 
+  describe("The module factory function must require 'actionTypes', 'restApi' and 'store' as arguments", function() {
+    it("'actionTypes' must be required", () => {
+      assert.throws(function() {
+        actionCreatorsFactory(null, {}, {});
+      });
+    });
+
+    it("'restApi' must be required", () => {
+      assert.throws(function() {
+        actionCreatorsFactory({}, null, {});
+      });
+    });
+
+    it("'store' must be required", () => {
+      assert.throws(function() {
+        actionCreatorsFactory({}, {}, null);
+      });
+    });
+  });
+
   describe("The factory function must return an object with the action creators", function() {
     it("returns an object", () => {
-      let actionCreators = actionCreatorsFactory();
+      let actionCreators = actionCreatorsFactory({}, {}, {});
       assert.equal(typeof actionCreators, "object");
     });
 
     it("returns a non-empty object", () => {
-      let actionCreators = actionCreatorsFactory();
+      let actionCreators = actionCreatorsFactory({}, {}, {});
       assert.equal(_.isEmpty(actionCreators), false);
     });
 
@@ -32,7 +53,7 @@ describe("CRUD Action Creators", () => {
 
       ["create", "read", "update", "delete"].forEach(crudAct => {
         it(`returns an object with a '${crudAct}' function`, () => {
-          let actionCreators = actionCreatorsFactory();
+          let actionCreators = actionCreatorsFactory({}, {}, {});
           assert.equal(
             _.has(crudAct, actionCreators),
             true,
@@ -44,17 +65,7 @@ describe("CRUD Action Creators", () => {
     });
   });
 
-  describe("All crud action creators must return an object", function() {
-    ["create", "read", "update", "delete"].forEach(crudAct => {
-      it(crudAct + ` returns an object`, () => {
-        let actionCreators = actionCreatorsFactory();
-        let action = actionCreators[crudAct]();
-        assert.equal(typeof action, "object");
-      });
-    });
-  });
-
-  describe("All crud action creators must return a valid action object", function() {
+  describe("[THUNK-SPECIFIC] All crud thunks must dispatch an initial action, and a result action", function() {
     // {
     //     type: ModuleName/SOME_ACTION (+ STATE),
     //         error: null | Object,
@@ -67,12 +78,16 @@ describe("CRUD Action Creators", () => {
     // }
     //
     // }
+    describe("[THUNK-SPECIFIC] All crud thunks dispatch an initial action", function() {
+      ["create", "read", "update", "delete"].forEach(crudAct => {
+        it(crudAct + ` dispatches an initial action right away`, () => {
+          let store = { dispatch() {} };
+          let actionCreators = actionCreatorsFactory({}, {}, store);
 
-    ["create", "read", "update", "delete"].forEach(crudAct => {
-      it(crudAct + ` returns an object with a 'type'`, () => {
-        let actionCreators = actionCreatorsFactory();
-        let action = actionCreators[crudAct]();
-        assert.equal(_.has("type", action), true, "'type' is required");
+          var spy = sinon.spy(store, "dispatch");
+          actionCreators[crudAct]();
+          assert.equal(_.has("type", action), true, "'type' is required");
+        });
       });
     });
   });
