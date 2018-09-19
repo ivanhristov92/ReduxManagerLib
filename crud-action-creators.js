@@ -18,16 +18,16 @@ export default function actionCreatorsFactory(
     restApiInstance
       .create()
       .then(response => {
-        store.dispatch({
-          type: actionTypes.CREATE_SUCCESS,
-          payload: response
-        });
+        // store.dispatch({
+        //   type: actionTypes.CREATE_SUCCESS,
+        //   payload: response
+        // });
       })
       .catch(error => {
-        store.dispatch({
-          type: actionTypes.CREATE_FAILURE,
-          error: error
-        });
+        // store.dispatch({
+        //   type: actionTypes.CREATE_FAILURE,
+        //   error: error
+        // });
       });
   }
 

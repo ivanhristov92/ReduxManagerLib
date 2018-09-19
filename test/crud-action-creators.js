@@ -9,6 +9,7 @@ import actionCreatorsFactory from "../crud-action-creators";
 var assert = require("assert");
 var sinon = require("sinon");
 import * as _ from "ramda";
+import actionTypesFactory from "../crud-action-types";
 
 describe("CRUD Action Creators", () => {
   describe("The module must expose a factory function, that creates the action creators for a model", function() {
@@ -79,15 +80,43 @@ describe("CRUD Action Creators", () => {
     //
     // }
     describe("[THUNK-SPECIFIC] All crud thunks dispatch an initial action", function() {
-      ["create", "read", "update", "delete"].forEach(crudAct => {
-        it(crudAct + ` dispatches an initial action right away`, () => {
-          let store = { dispatch() {} };
-          let actionCreators = actionCreatorsFactory({}, {}, store);
+      ["create"].forEach(crudAct => {
+        it(`"${crudAct}" should call store.dispatch at least once`, () => {
+          // 'dispatch' has been called at least once
 
-          var spy = sinon.spy(store, "dispatch");
+          let store = { dispatch() {} };
+          const restApi = { create: () => Promise.resolve() };
+          const actionCreators = actionCreatorsFactory({}, restApi, store);
+
+          sinon.spy(store, "dispatch");
           actionCreators[crudAct]();
-          assert.equal(_.has("type", action), true, "'type' is required");
+          const dispatchCall = store.dispatch.getCall(0);
+
+          assert.notEqual(dispatchCall, null);
         });
+
+        it(`"${crudAct}" should call store.dispatch firstly with a "bare" action type - without any state`, () => {
+          // 'dispatch' has been called at least once
+
+          let store = { dispatch() {} };
+          const restApi = { create: () => Promise.resolve() };
+          const actionTypes = actionTypesFactory("MyModel");
+          const actionCreators = actionCreatorsFactory(
+            actionTypes,
+            restApi,
+            store
+          );
+          const expectedActionType = actionTypes[crudAct.toUpperCase()];
+
+          sinon.spy(store, "dispatch");
+          actionCreators[crudAct]();
+
+          const dispatchCall = store.dispatch.getCall(0);
+          const dispatchedAction = dispatchCall.args[0];
+          assert.equal(dispatchedAction.type, expectedActionType);
+        });
+
+        // 'dispatch' has been called with the right action type the first time
       });
     });
   });
