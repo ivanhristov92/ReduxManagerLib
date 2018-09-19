@@ -7,46 +7,36 @@ export default function actionCreatorsFactory(actionTypes, restApiInstance) {
     throw new Error("'restApiInstance' is required as an argument");
   }
 
-  function create() {
-    return function _thunk_create(dispatch) {
-      dispatch({ type: actionTypes.CREATE });
-      return restApiInstance
-        .create()
-        .then(response => {
-          dispatch({
-            type: actionTypes.CREATE__SUCCESS
-            // payload: response
-          });
-        })
-        .catch(error => {
-          dispatch({
-            type: actionTypes.CREATE__FAILURE,
-            error: error
-          });
-        });
-    };
-  }
+  function thunkFactory(crudMethod) {
+    let actionTypeKey = crudMethod.toUpperCase();
+    let actionTypeSuccessKey = actionTypeKey + "__SUCCESS";
+    let actionTypeFailureKey = actionTypeKey + "__FAILURE";
 
-  function read() {
-    return {
-      type: "A"
-    };
-  }
-  function update() {
-    return {
-      type: "A"
-    };
-  }
-  function _delete() {
-    return {
-      type: "A"
+    return function crudThunk() {
+      return function _thunk_(dispatch) {
+        dispatch({ type: actionTypes[actionTypeKey] });
+        return restApiInstance
+          .create()
+          .then(response => {
+            dispatch({
+              type: actionTypes[actionTypeSuccessKey]
+              // payload: response
+            });
+          })
+          .catch(error => {
+            dispatch({
+              type: actionTypes[actionTypeFailureKey],
+              error: error
+            });
+          });
+      };
     };
   }
 
   return {
-    create,
-    read,
-    update,
-    delete: _delete
+    create: thunkFactory("create"),
+    read: thunkFactory("read"),
+    update: thunkFactory("update"),
+    delete: thunkFactory("delete")
   };
 }

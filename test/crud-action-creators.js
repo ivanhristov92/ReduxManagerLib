@@ -73,8 +73,11 @@ describe("CRUD Action Creators", () => {
     // }
     //
     // }
+
+    const CRUD = ["create", "read", "update"];
+
     describe("[THUNK-SPECIFIC] All crud thunks dispatch an initial action", function() {
-      ["create"].forEach(crudAct => {
+      CRUD.forEach(crudAct => {
         it(`"${crudAct}" should call store.dispatch at least once`, () => {
           // 'dispatch' has been called at least once
 
@@ -115,7 +118,7 @@ describe("CRUD Action Creators", () => {
     });
 
     describe("[THUNK-SPECIFIC] All crud thunks should dispatch a 'success' type action, when the promise resolves", function() {
-      ["create"].forEach(crudAct => {
+      CRUD.forEach(crudAct => {
         it(`"${crudAct}" should call store.dispatch at least 2 times`, done => {
           // 'dispatch' has been called at least once
 
