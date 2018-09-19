@@ -18,7 +18,7 @@ describe("CRUD Action Creators", () => {
     });
   });
 
-  describe("The module factory function must require 'actionTypes', 'restApi' and 'store' as arguments", function() {
+  describe("The module factory function must require 'actionTypes' and 'restApi' as arguments", function() {
     it("'actionTypes' must be required", () => {
       assert.throws(function() {
         actionCreatorsFactory(null, {}, {});
@@ -28,12 +28,6 @@ describe("CRUD Action Creators", () => {
     it("'restApi' must be required", () => {
       assert.throws(function() {
         actionCreatorsFactory({}, null, {});
-      });
-    });
-
-    it("'store' must be required", () => {
-      assert.throws(function() {
-        actionCreatorsFactory({}, {}, null);
       });
     });
   });
@@ -89,9 +83,10 @@ describe("CRUD Action Creators", () => {
           const actionCreators = actionCreatorsFactory({}, restApi, store);
 
           sinon.spy(store, "dispatch");
-          actionCreators[crudAct]();
-          const dispatchCall = store.dispatch.getCall(0);
+          const thunkFunction = actionCreators[crudAct]();
+          thunkFunction(store.dispatch);
 
+          const dispatchCall = store.dispatch.getCall(0);
           assert.notEqual(dispatchCall, null);
         });
 
@@ -109,14 +104,83 @@ describe("CRUD Action Creators", () => {
           const expectedActionType = actionTypes[crudAct.toUpperCase()];
 
           sinon.spy(store, "dispatch");
-          actionCreators[crudAct]();
+          const thunkFunction = actionCreators[crudAct]();
+          thunkFunction(store.dispatch);
 
           const dispatchCall = store.dispatch.getCall(0);
           const dispatchedAction = dispatchCall.args[0];
           assert.equal(dispatchedAction.type, expectedActionType);
         });
+      });
+    });
 
-        // 'dispatch' has been called with the right action type the first time
+    describe("[THUNK-SPECIFIC] All crud thunks should dispatch a 'success' type action, when the promise resolves", function() {
+      ["create"].forEach(crudAct => {
+        it(`"${crudAct}" should call store.dispatch at least 2 times`, done => {
+          // 'dispatch' has been called at least once
+
+          let store = { dispatch() {} };
+          const restApi = { create: () => Promise.resolve() };
+          const actionCreators = actionCreatorsFactory({}, restApi, store);
+
+          sinon.spy(store, "dispatch");
+          const thunkFunction = actionCreators[crudAct]();
+
+          thunkFunction(store.dispatch).then(function() {
+            const dispatchCall = store.dispatch.getCall(1);
+
+            assert.notEqual(dispatchCall, null);
+            done();
+          });
+        });
+
+        it(`"${crudAct}" should call store.dispatch with a 'success' action type the second time, when the promise resolves`, done => {
+          let store = { dispatch() {} };
+          const restApi = { create: () => Promise.resolve() };
+          const actionTypes = actionTypesFactory("MyModel");
+          const actionCreators = actionCreatorsFactory(
+            actionTypes,
+            restApi,
+            store
+          );
+          const expectedActionType =
+            actionTypes[crudAct.toUpperCase() + "__SUCCESS"];
+
+          sinon.spy(store, "dispatch");
+          const thunkFunction = actionCreators[crudAct]();
+
+          thunkFunction(store.dispatch).then(function() {
+            const dispatchCall = store.dispatch.getCall(1);
+            const dispatchedAction = dispatchCall.args[0];
+            assert.notEqual(typeof dispatchedAction.type, "undefined");
+            assert.equal(dispatchedAction.type, expectedActionType);
+            done();
+          });
+        });
+
+        it(`"${crudAct}" should call store.dispatch with a 'failure' action type the second time, when the promise rejects`, done => {
+          let store = { dispatch() {} };
+          const restApi = { create: () => Promise.reject() };
+          const actionTypes = actionTypesFactory("MyModel");
+          const actionCreators = actionCreatorsFactory(
+            actionTypes,
+            restApi,
+            store
+          );
+          const expectedActionType =
+            actionTypes[crudAct.toUpperCase() + "__FAILURE"];
+
+          sinon.spy(store, "dispatch");
+          const thunkFunction = actionCreators[crudAct]();
+
+          thunkFunction(store.dispatch).then(() => {
+            const dispatchCall = store.dispatch.getCall(1);
+            const dispatchedAction = dispatchCall.args[0];
+            assert.notEqual(typeof dispatchedAction.type, "undefined");
+            assert.equal(dispatchedAction.type, expectedActionType);
+            done();
+          });
+        });
       });
     });
   });

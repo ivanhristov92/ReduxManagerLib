@@ -1,8 +1,4 @@
-export default function actionCreatorsFactory(
-  actionTypes,
-  restApiInstance,
-  store
-) {
+export default function actionCreatorsFactory(actionTypes, restApiInstance) {
   if (!actionTypes) {
     throw new Error("'actionTypes' is required as an argument");
   }
@@ -10,25 +6,25 @@ export default function actionCreatorsFactory(
   if (!restApiInstance) {
     throw new Error("'restApiInstance' is required as an argument");
   }
-  if (!store) {
-    throw new Error("'store' is required as an argument");
-  }
+
   function create() {
-    store.dispatch({ type: actionTypes.CREATE });
-    restApiInstance
-      .create()
-      .then(response => {
-        // store.dispatch({
-        //   type: actionTypes.CREATE_SUCCESS,
-        //   payload: response
-        // });
-      })
-      .catch(error => {
-        // store.dispatch({
-        //   type: actionTypes.CREATE_FAILURE,
-        //   error: error
-        // });
-      });
+    return function _thunk_create(dispatch) {
+      dispatch({ type: actionTypes.CREATE });
+      return restApiInstance
+        .create()
+        .then(response => {
+          dispatch({
+            type: actionTypes.CREATE__SUCCESS
+            // payload: response
+          });
+        })
+        .catch(error => {
+          dispatch({
+            type: actionTypes.CREATE__FAILURE,
+            error: error
+          });
+        });
+    };
   }
 
   function read() {
