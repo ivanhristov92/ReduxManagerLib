@@ -82,7 +82,7 @@ describe("CRUD Action Creators", () => {
           // 'dispatch' has been called at least once
 
           let store = { dispatch() {} };
-          const restApi = { create: () => Promise.resolve() };
+          const restApi = { [crudAct]: () => Promise.resolve() };
           const actionCreators = actionCreatorsFactory({}, restApi, store);
 
           sinon.spy(store, "dispatch");
@@ -97,7 +97,7 @@ describe("CRUD Action Creators", () => {
           // 'dispatch' has been called at least once
 
           let store = { dispatch() {} };
-          const restApi = { create: () => Promise.resolve() };
+          const restApi = { [crudAct]: () => Promise.resolve() };
           const actionTypes = actionTypesFactory("MyModel");
           const actionCreators = actionCreatorsFactory(
             actionTypes,
@@ -123,7 +123,7 @@ describe("CRUD Action Creators", () => {
           // 'dispatch' has been called at least once
 
           let store = { dispatch() {} };
-          const restApi = { create: () => Promise.resolve() };
+          const restApi = { [crudAct]: () => Promise.resolve() };
           const actionCreators = actionCreatorsFactory({}, restApi, store);
 
           sinon.spy(store, "dispatch");
@@ -139,7 +139,7 @@ describe("CRUD Action Creators", () => {
 
         it(`"${crudAct}" should call store.dispatch with a 'success' action type the second time, when the promise resolves`, done => {
           let store = { dispatch() {} };
-          const restApi = { create: () => Promise.resolve() };
+          const restApi = { [crudAct]: () => Promise.resolve() };
           const actionTypes = actionTypesFactory("MyModel");
           const actionCreators = actionCreatorsFactory(
             actionTypes,
@@ -163,7 +163,7 @@ describe("CRUD Action Creators", () => {
 
         it(`"${crudAct}" should call store.dispatch with a 'failure' action type the second time, when the promise rejects`, done => {
           let store = { dispatch() {} };
-          const restApi = { create: () => Promise.reject() };
+          const restApi = { [crudAct]: () => Promise.reject() };
           const actionTypes = actionTypesFactory("MyModel");
           const actionCreators = actionCreatorsFactory(
             actionTypes,
@@ -194,7 +194,7 @@ describe("CRUD Action Creators", () => {
           let someTestPayload = { testPayload: true };
 
           const restApi = {
-            create: () => {
+            [crudAct]: () => {
               return Promise.resolve();
             }
           };
@@ -219,7 +219,7 @@ describe("CRUD Action Creators", () => {
           let someTestPayload = { testPayload: true };
 
           const restApi = {
-            create: () => {
+            [crudAct]: () => {
               return Promise.resolve(someTestPayload);
             }
           };
@@ -245,7 +245,7 @@ describe("CRUD Action Creators", () => {
           let testError = new Error("Test Error");
 
           const restApi = {
-            create: () => {
+            [crudAct]: () => {
               return Promise.reject(new Error("Test Error"));
             }
           };
@@ -262,6 +262,32 @@ describe("CRUD Action Creators", () => {
             const dispatchCall = store.dispatch.getCall(1);
             const dispatchedAction = dispatchCall.args[0];
             assert.deepEqual(dispatchedAction.error, testError);
+            done();
+          });
+        });
+
+        it(`"${crudAct}" should call the corresponding rest api method with the payload as an argument`, done => {
+          let store = { dispatch() {} };
+          let someTestPayload = { testPayload: true };
+
+          const restApi = {
+            [crudAct]: () => {
+              return Promise.resolve();
+            }
+          };
+
+          const actionCreators = actionCreatorsFactory(
+            { [crudAct.toUpperCase()]: crudAct.toUpperCase() },
+            restApi,
+            store
+          );
+
+          sinon.spy(restApi, crudAct);
+          const thunkFunction = actionCreators[crudAct](someTestPayload);
+          thunkFunction(store.dispatch).then(function() {
+            const restCall = restApi[crudAct].getCall(0);
+            const restCallArgument = restCall.args[0];
+            assert.deepEqual(restCallArgument, someTestPayload);
             done();
           });
         });

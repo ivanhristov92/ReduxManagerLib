@@ -15,8 +15,7 @@ export default function actionCreatorsFactory(actionTypes, restApiInstance) {
     return function crudThunk(payload) {
       return function _thunk_(dispatch) {
         dispatch({ type: actionTypes[actionTypeKey], payload });
-        return restApiInstance
-          .create()
+        return restApiInstance[crudMethod](payload)
           .then(response => {
             dispatch({
               type: actionTypes[actionTypeSuccessKey],
