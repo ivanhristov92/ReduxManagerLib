@@ -12,15 +12,15 @@ export default function actionCreatorsFactory(actionTypes, restApiInstance) {
     let actionTypeSuccessKey = actionTypeKey + "__SUCCESS";
     let actionTypeFailureKey = actionTypeKey + "__FAILURE";
 
-    return function crudThunk() {
+    return function crudThunk(payload) {
       return function _thunk_(dispatch) {
-        dispatch({ type: actionTypes[actionTypeKey] });
+        dispatch({ type: actionTypes[actionTypeKey], payload });
         return restApiInstance
           .create()
           .then(response => {
             dispatch({
-              type: actionTypes[actionTypeSuccessKey]
-              // payload: response
+              type: actionTypes[actionTypeSuccessKey],
+              payload: response
             });
           })
           .catch(error => {

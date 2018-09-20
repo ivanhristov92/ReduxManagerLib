@@ -186,5 +186,86 @@ describe("CRUD Action Creators", () => {
         });
       });
     });
+
+    describe("[THUNK-SPECIFIC] All crud  action types should carry the payload passed to them", function() {
+      CRUD.forEach(crudAct => {
+        it(`"${crudAct}" should carry the payload on the initial action`, () => {
+          let store = { dispatch() {} };
+          let someTestPayload = { testPayload: true };
+
+          const restApi = {
+            create: () => {
+              return Promise.resolve();
+            }
+          };
+
+          const actionCreators = actionCreatorsFactory(
+            { [crudAct.toUpperCase()]: crudAct.toUpperCase() },
+            restApi,
+            store
+          );
+
+          sinon.spy(store, "dispatch");
+          const thunkFunction = actionCreators[crudAct](someTestPayload);
+          thunkFunction(store.dispatch);
+
+          const dispatchCall = store.dispatch.getCall(0);
+          const dispatchedAction = dispatchCall.args[0];
+          assert.deepEqual(dispatchedAction.payload, someTestPayload);
+        });
+
+        it(`"${crudAct}" should carry the payload on the 'success' action`, done => {
+          let store = { dispatch() {} };
+          let someTestPayload = { testPayload: true };
+
+          const restApi = {
+            create: () => {
+              return Promise.resolve(someTestPayload);
+            }
+          };
+
+          const actionCreators = actionCreatorsFactory(
+            { [crudAct.toUpperCase()]: crudAct.toUpperCase() },
+            restApi,
+            store
+          );
+
+          sinon.spy(store, "dispatch");
+          const thunkFunction = actionCreators[crudAct]();
+          thunkFunction(store.dispatch).then(function() {
+            const dispatchCall = store.dispatch.getCall(1);
+            const dispatchedAction = dispatchCall.args[0];
+            assert.deepEqual(dispatchedAction.payload, someTestPayload);
+            done();
+          });
+        });
+
+        it(`"${crudAct}" should carry the error on the 'failure' action`, done => {
+          let store = { dispatch() {} };
+          let testError = new Error("Test Error");
+
+          const restApi = {
+            create: () => {
+              return Promise.reject(new Error("Test Error"));
+            }
+          };
+
+          const actionCreators = actionCreatorsFactory(
+            { [crudAct.toUpperCase()]: crudAct.toUpperCase() },
+            restApi,
+            store
+          );
+
+          sinon.spy(store, "dispatch");
+          const thunkFunction = actionCreators[crudAct]();
+          thunkFunction(store.dispatch).then(function() {
+            const dispatchCall = store.dispatch.getCall(1);
+            const dispatchedAction = dispatchCall.args[0];
+            assert.deepEqual(dispatchedAction.error, testError);
+            done();
+          });
+        });
+      });
+    });
   });
 });
