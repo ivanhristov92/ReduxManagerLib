@@ -34,6 +34,17 @@ describe("CRUD Rest Api", () => {
           );
           assert.equal(typeof restApi[crudAct], "function");
         });
+
+        it(`the '${crudAct}' function must return a Promise`, () => {
+          let restApi = restApiFactory();
+          let promise = restApi[crudAct]();
+
+          assert.equal(
+            typeof promise.then,
+            "function",
+            `${crudAct} does not return a Promise`
+          );
+        });
       });
     });
   });
