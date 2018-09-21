@@ -1,19 +1,20 @@
 import * as _ from "ramda";
 
-export default function reducerFactory() {
+export default function reducerFactory(actionTypes) {
+  const a = actionTypes;
   return function reducer(state = { byId: {}, isFetching: false }, action) {
     switch (action) {
-      case "CREATE":
-      case "READ":
-      case "UPDATE":
-      case "DELETE":
+      case a["CREATE"]:
+      case a["READ"]:
+      case a["UPDATE"]:
+      case a["DELETE"]:
         return {
           ...state,
           isFetching: true
         };
-      case "CREATE__SUCCESS":
-      case "READ__SUCCESS":
-      case "UPDATE__SUCCESS":
+      case a["CREATE__SUCCESS"]:
+      case a["READ__SUCCESS"]:
+      case a["UPDATE__SUCCESS"]:
         return {
           ...state,
           byId: {
@@ -22,16 +23,16 @@ export default function reducerFactory() {
           },
           isFetching: false
         };
-      case "CREATE__FAILURE":
-      case "READ__FAILURE":
-      case "UPDATE__FAILURE":
-      case "DELETE__FAILURE":
+      case a["CREATE__FAILURE"]:
+      case a["READ__FAILURE"]:
+      case a["UPDATE__FAILURE"]:
+      case a["DELETE__FAILURE"]:
         return {
           ...state,
           isFetching: false
         };
 
-      case "DELETE__SUCCESS":
+      case a["DELETE__SUCCESS"]:
         return {
           ...state,
           byId: _.omit([action.payload.id], state.byId),
