@@ -3,7 +3,10 @@ import * as _ from "ramda";
 export default function reducerFactory(actionTypes) {
   const a = actionTypes;
   return function reducer(state = { byId: {}, isFetching: false }, action) {
-    switch (action) {
+    if (!action.type) {
+      throw new TypeError("'not a valid action'");
+    }
+    switch (action.type) {
       case a["CREATE"]:
       case a["READ"]:
       case a["UPDATE"]:

@@ -15,42 +15,43 @@ describe("CRUD Rest Api", () => {
     });
   });
 
-  // describe("The factory function must return an object with the crud rest calls", function() {
-  //   it("returns an object", () => {
-  //     let restApi = restApiFactory();
-  //     assert.equal(typeof restApi, "object");
-  //   });
-  //
-  //   it("returns a non-empty object", () => {
-  //     let restApi = restApiFactory({}, {}, {});
-  //     assert.equal(_.isEmpty(restApi), false);
-  //   });
-  //
-  //   describe("The factory function must return an object with all crud rest calls", function() {
-  //     const propNotFound = " property was not found";
-  //
-  //     ["create", "read", "update", "delete"].forEach(crudAct => {
-  //       it(`the factory returns an object with a '${crudAct}' function`, () => {
-  //         let restApi = restApiFactory();
-  //         assert.equal(
-  //           _.has(crudAct, restApi),
-  //           true,
-  //           `${crudAct} ${propNotFound}`
-  //         );
-  //         assert.equal(typeof restApi[crudAct], "function");
-  //       });
-  //
-  //       it(`the '${crudAct}' function must return a Promise`, () => {
-  //         let restApi = restApiFactory();
-  //         let promise = restApi[crudAct]();
-  //
-  //         assert.equal(
-  //           typeof promise.then,
-  //           "function",
-  //           `${crudAct} does not return a Promise`
-  //         );
-  //       });
-  //     });
-  //   });
-  // });
+  describe("The reducer must handle actions correctly", function() {
+    it("The reducer should expect a valid action", () => {
+      const emptyActionTypes = {};
+      const reducer = reducerFactory();
+      const nonExistantAction = {};
+      assert.throws(function() {
+        let state = reducer(undefined, nonExistantAction);
+      }, Error);
+    });
+
+    it("The reducer should return a default state initially", () => {
+      const emptyActionTypes = {};
+      const reducer = reducerFactory(emptyActionTypes);
+      const nonExistantAction = { type: "TEST" };
+      let state = reducer(undefined, nonExistantAction);
+      assert.equal(typeof state, "object");
+      assert.deepEqual(state, { byId: {}, isFetching: false });
+    });
+
+    it("The reducer should return state as is, if the action is unknown", () => {
+      const emptyActionTypes = {};
+      const reducer = reducerFactory(emptyActionTypes);
+      const nonExistantAction = { type: "UNKNOWN" };
+      const testState = { byId: { test: true } };
+      let state = reducer(testState, nonExistantAction);
+      assert.deepEqual(state, testState);
+    });
+
+    ["CREATE", "READ", "UPDATE", "DELETE"].forEach(crudAct => {
+      it("The reducer should return state as is, if the action is unknown", () => {
+        // const emptyActionTypes = {};
+        // const reducer = reducerFactory(emptyActionTypes);
+        // const nonExistantAction = { type: "UNKNOWN" };
+        // const testState = { byId: { test: true } };
+        // let state = reducer(testState, nonExistantAction);
+        // assert.deepEqual(state, testState);
+      });
+    });
+  });
 });
