@@ -32,10 +32,36 @@ export default function actionCreatorsFactory(actionTypes, restApiInstance) {
     };
   }
 
-  return {
+  let actionCreators = {
     create: thunkFactory("create"),
     read: thunkFactory("read"),
     update: thunkFactory("update"),
     delete: thunkFactory("delete")
   };
+
+  function createExtendableActionCreators() {
+    const extendFunctionalityProto = {
+      extend(additionalActionCreators = {}) {
+        if (typeof additionalActionCreators !== "object") {
+          throw new TypeError(
+            "Expected and object, but received " +
+              typeof additionalActionCreators
+          );
+        }
+
+        let extendableActionCreators = createExtendableActionCreators();
+        return Object.assign(
+          extendableActionCreators,
+          additionalActionCreators
+        );
+      }
+    };
+
+    return Object.assign(
+      Object.create(extendFunctionalityProto),
+      actionCreators
+    );
+  }
+
+  return createExtendableActionCreators();
 }

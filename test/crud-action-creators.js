@@ -60,6 +60,46 @@ describe("CRUD Action Creators", () => {
     });
   });
 
+  describe("The object returned by the factory function must have an extend method used during model instantiation", function() {
+    it("The returned object has an extend method", () => {
+      let actionCreators = actionCreatorsFactory({}, {});
+      assert.equal(typeof actionCreators.extend, "function");
+    });
+
+    it("The 'extend' method returns an object", () => {
+      let actionCreators = actionCreatorsFactory({}, {});
+
+      let extendedActionCreators = actionCreators.extend({ testAction() {} });
+      assert.equal(typeof extendedActionCreators, "object");
+    });
+
+    it("The 'extend' method adds new action creatorss to the object", () => {
+      let actionCreators = actionCreatorsFactory({}, {});
+      let extendedActionCreators = actionCreators.extend({ testAction() {} });
+      assert.equal(_.has("testAction", extendedActionCreators), true);
+    });
+
+    it("The 'extend' method does not modify the original object", () => {
+      let actionCreators = actionCreatorsFactory({}, {});
+      let actionCreatorsBackup = actionCreatorsFactory({}, {});
+
+      actionCreators.extend({ testAction() {} });
+      assert.deepEqual(_.keys(actionCreators), _.keys(actionCreatorsBackup));
+    });
+
+    it("The 'extend' method accepts an object only and THROWS otherwise", () => {
+      let actionCreators = actionCreatorsFactory({}, {});
+
+      assert.throws(function testNonObjects() {
+        actionCreators.extend(undefined);
+        actionCreators.extend(null);
+        actionCreators.extend(10);
+        actionCreators.extend(false);
+        actionCreators.extend([]);
+      }, Error);
+    });
+  });
+
   describe("[THUNK-SPECIFIC] All crud thunks must dispatch an initial action, and a result action", function() {
     // {
     //     type: ModuleName/SOME_ACTION (+ STATE),
@@ -94,8 +134,6 @@ describe("CRUD Action Creators", () => {
         });
 
         it(`"${crudAct}" should call store.dispatch firstly with a "bare" action type - without any state`, () => {
-          // 'dispatch' has been called at least once
-
           let store = { dispatch() {} };
           const restApi = { [crudAct]: () => Promise.resolve() };
           const actionTypes = actionTypesFactory("MyModel");
