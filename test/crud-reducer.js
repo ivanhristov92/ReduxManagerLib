@@ -1,8 +1,4 @@
-import restApiFactory from "../crud-rest-api";
 var assert = require("assert");
-var sinon = require("sinon");
-import * as _ from "ramda";
-
 import reducerFactory from "../crud-reducer";
 
 describe("CRUD Rest Api", () => {
