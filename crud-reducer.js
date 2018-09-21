@@ -2,10 +2,12 @@ import * as _ from "ramda";
 
 export default function reducerFactory(actionTypes) {
   const a = actionTypes;
-  return function reducer(state = { byId: {}, isFetching: false }, action) {
+
+  function reducer(state = { byId: {}, isFetching: false }, action) {
     if (!action.type) {
       throw new TypeError("'not a valid action'");
     }
+
     switch (action.type) {
       case a["CREATE"]:
       case a["READ"]:
@@ -45,5 +47,9 @@ export default function reducerFactory(actionTypes) {
       default:
         return state;
     }
-  };
+  }
+
+  reducer.extend = function() {};
+
+  return reducer;
 }
