@@ -1,3 +1,5 @@
+import * as _ from "ramda";
+
 export default function reducerFactory() {
   return function reducer(state = { byId: {}, isFetching: false }, action) {
     switch (action) {
@@ -23,8 +25,16 @@ export default function reducerFactory() {
       case "CREATE__FAILURE":
       case "READ__FAILURE":
       case "UPDATE__FAILURE":
+      case "DELETE__FAILURE":
         return {
           ...state,
+          isFetching: false
+        };
+
+      case "DELETE__SUCCESS":
+        return {
+          ...state,
+          byId: _.omit([action.payload.id], state.byId),
           isFetching: false
         };
 
