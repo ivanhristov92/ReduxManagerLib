@@ -27,6 +27,10 @@ Without normalization of the data, the selectors need to be custom made, the red
 - The functions must return promises, as promises can be used inside observables and sagas – and are the simplest to work with.
 - All resolved data returned by the rest api function must be in normalized form, for the system to be able to work with it.
 - Error messages occurring in rest calls must come from in rejected promises only. If the need be, an adapter is implemented.
+- rest api function arguments are as follows:
+	= create(data: [Object]){}
+	= read(); read([id: any]){}
+	= update([id: any], data: Object)
 
 3. Naming
 a. Models – any string (“ModelName”)
@@ -53,6 +57,20 @@ e. Selectors – all selectors begin with “get”
 	}
 
 }
+
+5. Error handling
+- Action Creators
+= Type Errors
+= Runtime Errors
+- Reducer
+= Type Errors
+= Runtime Errors
+- Side Effects
+= Type Errors
+= Runtime Errors
+- Selectors
+= Type Errors
+= Runtime Errors
 
 Crucial User Facing Interface
 

@@ -35,17 +35,90 @@ describe("CRUD Rest Api", () => {
           assert.equal(typeof restApi[crudAct], "function");
         });
 
-        it(`the '${crudAct}' function must return a Promise`, () => {
+        // it(`the '${crudAct}' function must return a Promise`, () => {
+        //   let restApi = restApiFactory();
+        //   let promise = restApi[crudAct]();
+        //
+        //   assert.equal(
+        //     typeof promise.then,
+        //     "function",
+        //     `${crudAct} does not return a Promise`
+        //   );
+        // });
+      });
+    });
+
+    describe("create", function() {
+      describe(`the function must require as a 0 argument - an array of objects`, () => {
+        it("should throw if no argument is provided", () => {
           let restApi = restApiFactory();
-          let promise = restApi[crudAct]();
+
+          assert.throws(function() {
+            let promise = restApi.create();
+          }, TypeError);
+        });
+        it("should throw if it is passed an empty array", () => {
+          let restApi = restApiFactory();
+
+          assert.throws(function() {
+            let promise = restApi.create([]);
+          }, TypeError);
+        });
+
+        it(`the 'create' function must return a Promise`, () => {
+          let restApi = restApiFactory();
+          let promise = restApi.create([{ test: 1 }]);
 
           assert.equal(
             typeof promise.then,
             "function",
-            `${crudAct} does not return a Promise`
+            `$create does not return a Promise`
           );
         });
       });
+
+      describe(`the resolved data must be normalized`, () => {
+        it("should return normalized data with 1 entry when 1 object is created", done => {
+          let restApi = restApiFactory();
+
+          restApi.create([{ test: 1 }]).then(response => {
+            assert.equal(typeof response.byId, "object");
+            assert.equal(_.keys(response.byId).length, 1);
+            done();
+          });
+        });
+        it("should return normalized data with 2 entry when 2 object is created", done => {
+          let restApi = restApiFactory();
+
+          restApi.create([{ test: 1 }, { test: 2 }]).then(response => {
+            assert.equal(typeof response.byId, "object");
+            assert.equal(_.keys(response.byId).length, 2);
+            done();
+          });
+        });
+        it("should return normalized data with 3 entry when 3 object is created", done => {
+          let restApi = restApiFactory();
+
+          restApi
+            .create([{ test: 1 }, { test: 2 }, { test: 3 }])
+            .then(response => {
+              assert.equal(typeof response.byId, "object");
+              assert.equal(_.keys(response.byId).length, 3);
+              done();
+            });
+        });
+      });
+
+      // it(`the promise returned by the 'create' function  must resolve normalized data`, () => {
+      //     let restApi = restApiFactory();
+      //     let promise = restApi[crudAct]();
+      //
+      //     assert.equal(
+      //         typeof promise.then,
+      //         "function",
+      //         `${crudAct} does not return a Promise`
+      //     );
+      // });
     });
   });
 });
