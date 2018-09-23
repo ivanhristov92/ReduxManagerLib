@@ -12,6 +12,20 @@ export default function actionCreatorsFactory(actionTypes, restApiInstance) {
     let actionTypeSuccessKey = actionTypeKey + "__SUCCESS";
     let actionTypeFailureKey = actionTypeKey + "__FAILURE";
 
+    [actionTypeKey, actionTypeSuccessKey, actionTypeFailureKey].forEach(
+      actKey => {
+        if (!actionTypes[actKey]) {
+          throw new TypeError(
+            `"${actKey}" is not found in the actionTypes object`
+          );
+        }
+
+        if (!restApiInstance[actKey]) {
+          throw new TypeError(`"${actKey}" is not found in the restApi object`);
+        }
+      }
+    );
+
     return function crudThunk(payload) {
       return function _thunk_(dispatch) {
         dispatch({ type: actionTypes[actionTypeKey], payload });
