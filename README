@@ -59,12 +59,21 @@ e. Selectors – all selectors begin with “get”
 }
 
 5. Error handling
-- Action Creators
-= Type Errors
-= Runtime Errors
+
+a. Errors occuring during model initialization are thrown without any handling
+b. Runtime errors are handled
+
+- Rest Api
+= Runtime (including Type) Errors – returned  promise rejects
+format: {error: Any}
+- Action Creators (Thunks)
+= Type Errors For Arguments Required For Module Initialization - throws
+= Rejected Rest Api Promises – caught and dispatched by the thunk
 - Reducer
-= Type Errors
-= Runtime Errors
+= Type Errors For Arguments Required For Module Initialization - throws
+= Runtime Errors – returns the state with the error. Middleware can be used to dispatch the error.
+Who uses state errors → Subscribers
+Who uses middleware → error dispatcher
 - Side Effects
 = Type Errors
 = Runtime Errors
