@@ -28,7 +28,8 @@ export default function reducerFactory(actionTypes) {
         case a["DELETE"]:
           return {
             ...state,
-            isFetching: true
+            isFetching: true,
+            error: null
           };
         case a["CREATE__SUCCESS"]:
         case a["READ__SUCCESS"]:
@@ -39,22 +40,31 @@ export default function reducerFactory(actionTypes) {
               ...state.byId,
               ...action.payload.byId
             },
-            isFetching: false
+            isFetching: false,
+            error: null
           };
         case a["CREATE__FAILURE"]:
         case a["READ__FAILURE"]:
         case a["UPDATE__FAILURE"]:
-        case a["DELETE__FAILURE"]:
+        case a["DELETE__FAILURE"]: {
+          if (!action.error) {
+            throw new TypeError(
+              "failure action needs to have an 'error' attribute"
+            );
+          }
           return {
             ...state,
-            isFetching: false
+            isFetching: false,
+            error: action.error
           };
+        }
 
         case a["DELETE__SUCCESS"]:
           return {
             ...state,
             byId: _.omit([action.payload.id], state.byId),
-            isFetching: false
+            isFetching: false,
+            error: null
           };
 
         default:
