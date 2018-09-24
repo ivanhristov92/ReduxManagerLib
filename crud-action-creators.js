@@ -28,20 +28,24 @@ export default function actionCreatorsFactory(actionTypes, restApiInstance) {
 
     return function crudThunk(payload) {
       return function _thunk_(dispatch) {
-        dispatch({ type: actionTypes[actionTypeKey], payload });
-        return restApiInstance[crudMethod](payload)
-          .then(response => {
-            dispatch({
-              type: actionTypes[actionTypeSuccessKey],
-              payload: response
+        try {
+          dispatch({ type: actionTypes[actionTypeKey], payload });
+          return restApiInstance[crudMethod](payload)
+            .then(response => {
+              dispatch({
+                type: actionTypes[actionTypeSuccessKey],
+                payload: response
+              });
+            })
+            .catch(error => {
+              dispatch({
+                type: actionTypes[actionTypeFailureKey],
+                error: error
+              });
             });
-          })
-          .catch(error => {
-            dispatch({
-              type: actionTypes[actionTypeFailureKey],
-              error: error
-            });
-          });
+        } catch (error) {
+          // emit a global error event
+        }
       };
     };
   }

@@ -65,13 +65,16 @@ b. Runtime errors are handled
 
 - Rest Api
 = Runtime (including Type) Errors – returned  promise rejects
+= unexpected run-time errors – emitted with a global error event
 format: {error: Any}
 - Action Creators (Thunks)
 = Type Errors For Arguments Required For Module Initialization - throws
 = Rejected Rest Api Promises – caught and dispatched by the thunk
+= Unexpected run-time errors – caught and emitted to in a global error event
 - Reducer
 = Type Errors For Arguments Required For Module Initialization - throws
 = Runtime Errors – returns the state with the error. Middleware can be used to dispatch the error.
+= unexpected run-time errors – emitted globally as a custom error event
 Who uses state errors → Subscribers
 Who uses middleware → error dispatcher
 - Side Effects

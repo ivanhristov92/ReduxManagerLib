@@ -71,10 +71,15 @@ export default function reducerFactory(actionTypes) {
           return state;
       }
     } catch (error) {
-      return {
-        ...state,
-        error: error
-      };
+      // unexpeted run-time error
+      try {
+        return {
+          ...state,
+          error: error
+        };
+      } catch (err) {
+        //emit global error
+      }
     }
   }
 
