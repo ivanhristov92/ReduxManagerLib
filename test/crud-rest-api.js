@@ -5,31 +5,35 @@ import * as _ from "ramda";
 
 describe("CRUD Rest Api", () => {
   describe("[EXPORTS INTERFACE] The module must expose a factory function, that creates the rest api functions for a model", function() {
-    it("The module should default export a function", () => {
-      assert.equal(typeof restApiFactory, "function");
+    describe("[EXPORTS A FACTORY]", function() {
+      it("The module should default export a function", () => {
+        assert.equal(typeof restApiFactory, "function");
+      });
     });
 
-    it("returns an object", () => {
-      let restApi = restApiFactory();
-      assert.equal(typeof restApi, "object");
-    });
-
-    it("returns a non-empty object", () => {
-      let restApi = restApiFactory({}, {}, {});
-      assert.equal(_.isEmpty(restApi), false);
-    });
-
-    ["create", "read", "update", "delete"].forEach(crudAct => {
-      const propNotFound = " property was not found";
-
-      it(`the factory returns an object with a '${crudAct}' function`, () => {
+    describe("[FACTORY RETURNS]", () => {
+      it("returns an object", () => {
         let restApi = restApiFactory();
-        assert.equal(
-          _.has(crudAct, restApi),
-          true,
-          `${crudAct} ${propNotFound}`
-        );
-        assert.equal(typeof restApi[crudAct], "function");
+        assert.equal(typeof restApi, "object");
+      });
+
+      it("returns a non-empty object", () => {
+        let restApi = restApiFactory({}, {}, {});
+        assert.equal(_.isEmpty(restApi), false);
+      });
+
+      ["create", "read", "update", "delete"].forEach(crudAct => {
+        const propNotFound = " property was not found";
+
+        it(`[CONTAINS METHOD] the factory returns an object with a '${crudAct}' function`, () => {
+          let restApi = restApiFactory();
+          assert.equal(
+            _.has(crudAct, restApi),
+            true,
+            `${crudAct} ${propNotFound}`
+          );
+          assert.equal(typeof restApi[crudAct], "function");
+        });
       });
     });
   });
