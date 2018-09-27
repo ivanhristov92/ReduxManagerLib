@@ -62,6 +62,7 @@ e. Selectors – all selectors begin with “get”
 
 a. Errors occuring during model initialization are thrown without any handling
 b. Runtime errors are handled
+c. Custom Error Types: ModuleInitializationTypeError, UnexpectedRuntimeError – to be handled globally
 
 - Rest Api
 = Runtime (including Type) Errors – returned  promise rejects
