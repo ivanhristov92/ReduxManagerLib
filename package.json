@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --require babel-polyfill --require babel-register ./test/**/crud-rest-api.js"
+    "test": "mocha --require babel-polyfill --require babel-register ./test/**/crud-error-types.js"
   },
   "author": "",
   "license": "ISC",
