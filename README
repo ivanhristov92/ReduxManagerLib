@@ -32,6 +32,7 @@ Without normalization of the data, the selectors need to be custom made, the red
 	= read(); read([id: any]){}
 	= update([id: any], data: Object)
 
+
 3. Naming
 a. Models – any string (“ModelName”)
 b. Action Types – ModelName/SOME_ACTION__STATE
@@ -60,14 +61,14 @@ e. Selectors – all selectors begin with “get”
 
 5. Error handling
 
-a. Errors occuring during model initialization are thrown without any handling
+a. Errors occuring during model initialization are thrown without any handling as a  ModuleInitializationTypeError error
 b. Runtime errors are handled
 c. Custom Error Types: ModuleInitializationTypeError, UnexpectedRuntimeError – to be handled globally
 
 - Rest Api
 = Runtime (including Type) Errors – returned  promise rejects
-= unexpected run-time errors – emitted with a global error event
-format: {error: Any}
+= unexpected run-time errors – emitted with a global error event (details are unclear)
+= format: return the error directly.
 - Action Creators (Thunks)
 = Type Errors For Arguments Required For Module Initialization - throws
 = Rejected Rest Api Promises – caught and dispatched by the thunk
@@ -166,3 +167,53 @@ Development Stage 1
 3. Layers Configuration – just keep it in mind
 4. Model Configuration
 5. Tests – make tests reusable for custom layer implementations
+
+
+
+
+
+
+
+
+
+
+
+
+
+Tests Structure
+
+Module Exports
+	[EXPORTS] default export
+		check for naming (module.default.someName/ module.default.SomeName, etc.)
+	[EXPORTS] named export
+		check for naming (module.someName, module.SomeName, etc.)
+
+
+Signature Of Exports
+
+	[MODULE INITIALIZATION SIGNATURE] module initialization signature:
+	[RUNTIME SIGNATURE] run-time signature:
+
+	- both share:
+
+	[EXPECTS] arguments
+		 correct values
+		[ACCEPTS] values
+		[THROWS] / [REJECTS] errors
+		[HANDLES] error handling
+	[RETURNS] return values
+		[CORRECT TYPE] correct values (objects, classes, 											functions, primitives);
+		[CORRECT VALUE]
+
+
+
+
+
+
+
+
+
+
+
+
+Dependency Diagram

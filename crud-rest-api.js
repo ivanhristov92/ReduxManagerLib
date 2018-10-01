@@ -3,19 +3,19 @@ export default function restApiFactory() {
     create(objects) {
       return new Promise((resolve, reject) => {
         if (!Array.isArray(objects)) {
-          reject({
-            error: new TypeError(
+          reject(
+            new TypeError(
               "'create' expects am array of objects. You provided: " +
                 typeof objects
             )
-          });
+          );
         }
         if (objects.length === 0) {
-          reject({
-            error: new TypeError(
+          reject(
+            new TypeError(
               "'create' expects am array of objects. You provided an empty array"
             )
-          });
+          );
         }
 
         let response = objects.reduce(

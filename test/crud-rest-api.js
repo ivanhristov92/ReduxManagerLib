@@ -40,19 +40,21 @@ describe("CRUD Rest Api", () => {
 
   describe("[METHOD SIGNATURES] 'create' has the right signature", function() {
     describe(`the function must require as a 0 argument - an array of objects`, () => {
-      it("should throw if no argument is provided", () => {
+      it("should reject if no argument is provided", done => {
         let restApi = restApiFactory();
 
-        assert.throws(function() {
-          let promise = restApi.create();
-        }, TypeError);
+        restApi.create().catch(error => {
+          assert.equal(error instanceof Error, true);
+          done();
+        });
       });
-      it("should throw if it is passed an empty array", () => {
+      it("should reject if it is passed an empty array", done => {
         let restApi = restApiFactory();
 
-        assert.throws(function() {
-          let promise = restApi.create([]);
-        }, TypeError);
+        restApi.create([]).catch(error => {
+          assert.equal(error instanceof Error, true);
+          done();
+        });
       });
 
       it(`the 'create' function must return a Promise`, () => {

@@ -10,25 +10,28 @@ var assert = require("assert");
 var sinon = require("sinon");
 import * as _ from "ramda";
 import actionTypesFactory from "../crud-action-types";
+import * as customErrors from "../crud-error-types";
 
 describe("CRUD Action Creators", () => {
-  describe("The module must expose a factory function, that creates the action creators for a model", function() {
+  describe("[EXPORTS A FACTORY] The module must expose a factory function, that creates the action creators for a model", function() {
     it("The module should default export a function", () => {
       assert.equal(typeof actionCreatorsFactory, "function");
     });
   });
 
-  describe("The module factory function must require 'actionTypes' and 'restApi' as arguments", function() {
-    it("'actionTypes' must be required", () => {
+  describe("[FACTORY SIGNATURE] The module factory function must require 'actionTypes' and 'restApi' as arguments", function() {
+    describe();
+
+    it("[REQUIRED ARGUMENT] 'actionTypes' must be required", () => {
       assert.throws(function() {
         actionCreatorsFactory(null, {}, {});
-      });
+      }, customErrors.ModuleInitializationTypeError);
     });
 
-    it("'restApi' must be required", () => {
+    it("[REQUIRED ARGUMENT] 'restApi' must be required", () => {
       assert.throws(function() {
         actionCreatorsFactory({}, null, {});
-      });
+      }, customErrors.ModuleInitializationTypeError);
     });
   });
 
