@@ -1,7 +1,7 @@
 import * as _ from "ramda";
 import * as customErrors from "./crud-error-types";
 
-const thunkFactory = _.curry(function(
+const _thunkFactory = _.curry(function(
   actionTypes,
   restApiInstance,
   crudMethod
@@ -77,14 +77,14 @@ export default function actionCreatorsFactory(actionTypes, restApiInstance) {
     );
   }
 
-  // let thunkFactory = thunkFactory(actionTypes, restApiInstance);
-  //
-  // let actionCreators = {
-  //   create: thunkFactory("create"),
-  //   read: thunkFactory("read"),
-  //   update: thunkFactory("update"),
-  //   delete: thunkFactory("delete")
-  // };
-  //
-  // return addExtendFunctionality(actionCreators);
+  let thunkFactory = _thunkFactory(actionTypes, restApiInstance);
+
+  let actionCreators = {
+    create: thunkFactory("create")
+    // read: thunkFactory("read"),
+    // update: thunkFactory("update"),
+    // delete: thunkFactory("delete")
+  };
+  return actionCreators;
+  return addExtendFunctionality(actionCreators);
 }

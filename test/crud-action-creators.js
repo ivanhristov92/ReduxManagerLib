@@ -52,34 +52,39 @@ describe("CRUD Action Creators", () => {
         }
       });
     });
+
+    describe("[RETURNS] the factory function returns:", () => {
+      describe("[CORRECT TYPE] The factory function must return an object with the action creators", () => {
+        it("returns an object", () => {
+          let actionCreators = actionCreatorsFactory({}, {}, {});
+          assert.equal(typeof actionCreators, "object");
+        });
+
+        // it("returns a non-empty object", () => {
+        //   let actionCreators = actionCreatorsFactory({}, {}, {});
+        //   assert.equal(_.isEmpty(actionCreators), false);
+        // });
+
+        // ["create", "read", "update", "delete"].forEach(crudAct => {
+        //   const propNotFound = " property was not found";
+        //   it(`returns an object with a '${crudAct}' function`, () => {
+        //     let actionCreators = actionCreatorsFactory(
+        //       { [crudAct]: crudAct },
+        //       {},
+        //       {}
+        //     );
+        //     assert.equal(
+        //       _.has(crudAct, actionCreators),
+        //       true,
+        //       `${crudAct} ${propNotFound}`
+        //     );
+        //     assert.equal(typeof actionCreators[crudAct], "function");
+        //   });
+        // });
+      });
+    });
   });
-  // describe("The factory function must return an object with the action creators", function() {
-  //   it("returns an object", () => {
-  //     let actionCreators = actionCreatorsFactory({}, {}, {});
-  //     assert.equal(typeof actionCreators, "object");
-  //   });
-  //
-  //   it("returns a non-empty object", () => {
-  //     let actionCreators = actionCreatorsFactory({}, {}, {});
-  //     assert.equal(_.isEmpty(actionCreators), false);
-  //   });
-  //
-  //   describe("The factory function must return an object with all non-stateful action creators", function() {
-  //     const propNotFound = " property was not found";
-  //
-  //     ["create", "read", "update", "delete"].forEach(crudAct => {
-  //       it(`returns an object with a '${crudAct}' function`, () => {
-  //         let actionCreators = actionCreatorsFactory({}, {}, {});
-  //         assert.equal(
-  //           _.has(crudAct, actionCreators),
-  //           true,
-  //           `${crudAct} ${propNotFound}`
-  //         );
-  //         assert.equal(typeof actionCreators[crudAct], "function");
-  //       });
-  //     });
-  //   });
-  // });
+
   // describe("The object returned by the factory function must have an extend method used during model instantiation", function() {
   //   it("The returned object has an extend method", () => {
   //     let actionCreators = actionCreatorsFactory({}, {});
