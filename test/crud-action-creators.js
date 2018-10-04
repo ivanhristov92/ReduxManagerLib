@@ -10,26 +10,47 @@ var assert = require("assert");
 var sinon = require("sinon");
 import * as _ from "ramda";
 import actionTypesFactory from "../crud-action-types";
-import * as customErrors from "../crud-error-types";
+import { ModuleInitializationTypeError } from "../crud-error-types";
 
 describe("CRUD Action Creators", () => {
-  describe("[EXPORTS A FACTORY] The module must expose a factory function, that creates the action creators for a model", function() {
+  describe("[EXPORTS] The module must expose a factory function, that creates the action creators for a model", function() {
     it("The module should default export a function", () => {
       assert.equal(typeof actionCreatorsFactory, "function");
     });
   });
-  //
-  describe("[FACTORY SIGNATURE] The module factory function must require 'actionTypes' and 'restApi' as arguments", function() {
-    it("[REQUIRED ARGUMENT] 'actionTypes' must be required", () => {
-      assert.throws(function() {
-        actionCreatorsFactory(null, {}, {});
-      }, customErrors.ModuleInitializationTypeError);
+
+  describe("[MODULE INITIALIZATION SIGNATURE] The module factory function must require 'actionTypes' and 'restApi' as arguments", function() {
+    describe("[EXPECTS] 'actionTypes' must be required", () => {
+      it("[THROWS] if 'actionTypes' is not provided", () => {
+        assert.throws(function() {
+          actionCreatorsFactory(null, {}, {});
+        }, Error);
+      });
+
+      it("[THROWS] throws a ModuleInitializationTypeError if 'actionTypes' is not provided", () => {
+        try {
+          actionCreatorsFactory(null, {}, {});
+        } catch (err) {
+          assert.equal(err.name, "ModuleInitializationTypeError");
+        }
+      });
     });
 
-    it("[REQUIRED ARGUMENT] 'restApi' must be required", () => {
-      assert.throws(function() {
-        actionCreatorsFactory({}, null, {});
-      }, customErrors.ModuleInitializationTypeError);
+    describe("[EXPECTS] 'restApi' must be required", () => {
+      it("[THROWS] if 'restApi' is not provided", () => {
+        assert.throws(function() {
+          actionCreatorsFactory({}, null, {});
+        }, Error);
+      });
+
+      it("[THROWS] throws a ModuleInitializationTypeError if 'restApi' is not provided", () => {
+        try {
+          actionCreatorsFactory({}, null, {});
+          throw new Error("should have thrown");
+        } catch (err) {
+          assert.equal(err.name, "ModuleInitializationTypeError");
+        }
+      });
     });
   });
   // describe("The factory function must return an object with the action creators", function() {

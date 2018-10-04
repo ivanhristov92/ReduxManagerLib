@@ -1,4 +1,5 @@
 import * as _ from "ramda";
+import * as customErrors from "./crud-error-types";
 
 const thunkFactory = _.curry(function(
   actionTypes,
@@ -65,21 +66,25 @@ const addExtendFunctionality = (function() {
 
 export default function actionCreatorsFactory(actionTypes, restApiInstance) {
   if (!actionTypes) {
-    throw new Error("'actionTypes' is required as an argument");
+    throw new customErrors.ModuleInitializationTypeError(
+      "'actionTypes' is required as an argument"
+    );
   }
 
   if (!restApiInstance) {
-    throw new Error("'restApiInstance' is required as an argument");
+    throw new customErrors.ModuleInitializationTypeError(
+      "'restApiInstance' is required as an argument"
+    );
   }
 
-  let thunkFactory = thunkFactory(actionTypes, restApiInstance);
-
-  let actionCreators = {
-    create: thunkFactory("create"),
-    read: thunkFactory("read"),
-    update: thunkFactory("update"),
-    delete: thunkFactory("delete")
-  };
-
-  return addExtendFunctionality(actionCreators);
+  // let thunkFactory = thunkFactory(actionTypes, restApiInstance);
+  //
+  // let actionCreators = {
+  //   create: thunkFactory("create"),
+  //   read: thunkFactory("read"),
+  //   update: thunkFactory("update"),
+  //   delete: thunkFactory("delete")
+  // };
+  //
+  // return addExtendFunctionality(actionCreators);
 }
