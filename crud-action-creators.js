@@ -1,3 +1,68 @@
+import * as _ from "ramda";
+
+const thunkFactory = _.curry(function(
+  actionTypes,
+  restApiInstance,
+  crudMethod
+) {
+  let actionTypeKey = crudMethod.toUpperCase();
+  let actionTypeSuccessKey = actionTypeKey + "__SUCCESS";
+  let actionTypeFailureKey = actionTypeKey + "__FAILURE";
+
+  [actionTypeKey, actionTypeSuccessKey, actionTypeFailureKey].forEach(
+    actKey => {
+      if (!actionTypes[actKey]) {
+        throw new TypeError(
+          `"${actKey}" is not found in the actionTypes object`
+        );
+      }
+
+      if (!restApiInstance[actKey]) {
+        throw new TypeError(`"${actKey}" is not found in the restApi object`);
+      }
+    }
+  );
+
+  return function crudThunk(payload) {
+    return function _thunk_(dispatch) {
+      try {
+        dispatch({ type: actionTypes[actionTypeKey], payload });
+        return restApiInstance[crudMethod](payload)
+          .then(response => {
+            dispatch({
+              type: actionTypes[actionTypeSuccessKey],
+              payload: response
+            });
+          })
+          .catch(error => {
+            dispatch({
+              type: actionTypes[actionTypeFailureKey],
+              error: error
+            });
+          });
+      } catch (error) {
+        // emit a global error event
+      }
+    };
+  };
+});
+
+const addExtendFunctionality = (function() {
+  function extend(additionalProperties = {}) {
+    if (typeof additionalProperties !== "object") {
+      throw new TypeError(
+        "Expected and object, but received " + typeof additionalProperties
+      );
+    }
+
+    return Object.assign(Object.create(this), additionalProperties);
+  }
+
+  return function addExtendFunctionality(objectToExtend) {
+    return Object.assign(Object.create({ extend }), objectToExtend);
+  };
+})();
+
 export default function actionCreatorsFactory(actionTypes, restApiInstance) {
   if (!actionTypes) {
     throw new Error("'actionTypes' is required as an argument");
@@ -7,48 +72,7 @@ export default function actionCreatorsFactory(actionTypes, restApiInstance) {
     throw new Error("'restApiInstance' is required as an argument");
   }
 
-  function thunkFactory(crudMethod) {
-    let actionTypeKey = crudMethod.toUpperCase();
-    let actionTypeSuccessKey = actionTypeKey + "__SUCCESS";
-    let actionTypeFailureKey = actionTypeKey + "__FAILURE";
-
-    [actionTypeKey, actionTypeSuccessKey, actionTypeFailureKey].forEach(
-      actKey => {
-        if (!actionTypes[actKey]) {
-          throw new TypeError(
-            `"${actKey}" is not found in the actionTypes object`
-          );
-        }
-
-        if (!restApiInstance[actKey]) {
-          throw new TypeError(`"${actKey}" is not found in the restApi object`);
-        }
-      }
-    );
-
-    return function crudThunk(payload) {
-      return function _thunk_(dispatch) {
-        try {
-          dispatch({ type: actionTypes[actionTypeKey], payload });
-          return restApiInstance[crudMethod](payload)
-            .then(response => {
-              dispatch({
-                type: actionTypes[actionTypeSuccessKey],
-                payload: response
-              });
-            })
-            .catch(error => {
-              dispatch({
-                type: actionTypes[actionTypeFailureKey],
-                error: error
-              });
-            });
-        } catch (error) {
-          // emit a global error event
-        }
-      };
-    };
-  }
+  let thunkFactory = thunkFactory(actionTypes, restApiInstance);
 
   let actionCreators = {
     create: thunkFactory("create"),
@@ -57,29 +81,5 @@ export default function actionCreatorsFactory(actionTypes, restApiInstance) {
     delete: thunkFactory("delete")
   };
 
-  function createExtendableActionCreators() {
-    const extendFunctionalityProto = {
-      extend(additionalActionCreators = {}) {
-        if (typeof additionalActionCreators !== "object") {
-          throw new TypeError(
-            "Expected and object, but received " +
-              typeof additionalActionCreators
-          );
-        }
-
-        let extendableActionCreators = createExtendableActionCreators();
-        return Object.assign(
-          extendableActionCreators,
-          additionalActionCreators
-        );
-      }
-    };
-
-    return Object.assign(
-      Object.create(extendFunctionalityProto),
-      actionCreators
-    );
-  }
-
-  return createExtendableActionCreators();
+  return addExtendFunctionality(actionCreators);
 }
