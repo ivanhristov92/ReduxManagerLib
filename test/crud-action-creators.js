@@ -12,6 +12,28 @@ import * as _ from "ramda";
 import actionTypesFactory from "../crud-action-types";
 import { ModuleInitializationTypeError } from "../crud-error-types";
 
+const mockActionTypes = {
+  CREATE: "CREATE",
+  CREATE__SUCCESS: "CREATE__SUCCESS",
+  CREATE__FAILURE: "CREATE__FAILURE",
+  READ: "READ",
+  READ__SUCCESS: "READ__SUCCESS",
+  READ__FAILURE: "READ__FAILURE",
+  UPDATE: "UPDATE",
+  UPDATE__SUCCESS: "UPDATE__SUCCESS",
+  UPDATE__FAILURE: "UPDATE__FAILURE",
+  DELETE: "DELETE",
+  DELETE__SUCCESS: "DELETE__SUCCESS",
+  DELETE__FAILURE: "DELETE__FAILURE"
+};
+
+const mockRestApi = {
+  create() {},
+  read() {},
+  update() {},
+  delete() {}
+};
+
 describe("CRUD Action Creators", () => {
   describe("[EXPORTS] The module must expose a factory function, that creates the action creators for a model", function() {
     it("The module should default export a function", () => {
@@ -55,75 +77,75 @@ describe("CRUD Action Creators", () => {
 
     describe("[RETURNS] the factory function returns:", () => {
       describe("[CORRECT TYPE] The factory function must return an object with the action creators", () => {
+        let actionCreators;
+        beforeEach(function() {
+          actionCreators = actionCreatorsFactory(mockActionTypes, mockRestApi);
+        });
+
         it("returns an object", () => {
-          let actionCreators = actionCreatorsFactory({}, {}, {});
           assert.equal(typeof actionCreators, "object");
         });
 
-        // it("returns a non-empty object", () => {
-        //   let actionCreators = actionCreatorsFactory({}, {}, {});
-        //   assert.equal(_.isEmpty(actionCreators), false);
-        // });
+        it("returns a non-empty object", () => {
+          assert.equal(_.isEmpty(actionCreators), false);
+        });
 
-        // ["create", "read", "update", "delete"].forEach(crudAct => {
-        //   const propNotFound = " property was not found";
-        //   it(`returns an object with a '${crudAct}' function`, () => {
-        //     let actionCreators = actionCreatorsFactory(
-        //       { [crudAct]: crudAct },
-        //       {},
-        //       {}
-        //     );
-        //     assert.equal(
-        //       _.has(crudAct, actionCreators),
-        //       true,
-        //       `${crudAct} ${propNotFound}`
-        //     );
-        //     assert.equal(typeof actionCreators[crudAct], "function");
-        //   });
-        // });
+        ["create", "read", "update", "delete"].forEach(crudAct => {
+          const propNotFound = " property was not found";
+          it(`returns an object with a '${crudAct}' function`, () => {
+            assert.equal(
+              _.has(crudAct, actionCreators),
+              true,
+              `${crudAct} ${propNotFound}`
+            );
+            assert.equal(typeof actionCreators[crudAct], "function");
+          });
+        });
       });
     });
   });
 
-  // describe("The object returned by the factory function must have an extend method used during model instantiation", function() {
-  //   it("The returned object has an extend method", () => {
-  //     let actionCreators = actionCreatorsFactory({}, {});
-  //     assert.equal(typeof actionCreators.extend, "function");
-  //   });
-  //
-  //   it("The 'extend' method returns an object", () => {
-  //     let actionCreators = actionCreatorsFactory({}, {});
-  //
-  //     let extendedActionCreators = actionCreators.extend({ testAction() {} });
-  //     assert.equal(typeof extendedActionCreators, "object");
-  //   });
-  //
-  //   it("The 'extend' method adds new action creatorss to the object", () => {
-  //     let actionCreators = actionCreatorsFactory({}, {});
-  //     let extendedActionCreators = actionCreators.extend({ testAction() {} });
-  //     assert.equal(_.has("testAction", extendedActionCreators), true);
-  //   });
-  //
-  //   it("The 'extend' method does not modify the original object", () => {
-  //     let actionCreators = actionCreatorsFactory({}, {});
-  //     let actionCreatorsBackup = actionCreatorsFactory({}, {});
-  //
-  //     actionCreators.extend({ testAction() {} });
-  //     assert.deepEqual(_.keys(actionCreators), _.keys(actionCreatorsBackup));
-  //   });
-  //
-  //   it("The 'extend' method accepts an object only and THROWS otherwise", () => {
-  //     let actionCreators = actionCreatorsFactory({}, {});
-  //
-  //     assert.throws(function testNonObjects() {
-  //       actionCreators.extend(undefined);
-  //       actionCreators.extend(null);
-  //       actionCreators.extend(10);
-  //       actionCreators.extend(false);
-  //       actionCreators.extend([]);
-  //     }, Error);
-  //   });
-  // });
+  describe("The object returned by the factory function must have an extend method used during model instantiation", function() {
+    let actionCreators;
+    beforeEach(function() {
+      actionCreators = actionCreatorsFactory(mockActionTypes, mockRestApi);
+    });
+    it("The returned object has an extend method", () => {
+      assert.equal(typeof actionCreators.extend, "function");
+    });
+    //
+    it("The 'extend' method returns an object", () => {
+      let extendedActionCreators = actionCreators.extend({});
+      assert.equal(typeof extendedActionCreators, "object");
+    });
+
+    it("The 'extend' method adds new action creators to the object", () => {
+      let extendedActionCreators = actionCreators.extend({ testAction() {} });
+      assert.equal(_.has("testAction", extendedActionCreators), true);
+    });
+
+    it("The 'extend' method does not modify the original object", () => {
+      let actionCreatorsBackup = actionCreatorsFactory(
+        mockActionTypes,
+        mockRestApi
+      );
+
+      actionCreators.extend({ testAction() {} });
+      assert.deepEqual(_.keys(actionCreators), _.keys(actionCreatorsBackup));
+    });
+    //
+    //   it("The 'extend' method accepts an object only and THROWS otherwise", () => {
+    //     let actionCreators = actionCreatorsFactory({}, {});
+    //
+    //     assert.throws(function testNonObjects() {
+    //       actionCreators.extend(undefined);
+    //       actionCreators.extend(null);
+    //       actionCreators.extend(10);
+    //       actionCreators.extend(false);
+    //       actionCreators.extend([]);
+    //     }, Error);
+    //   });
+  });
   // describe("[THUNK-SPECIFIC] All crud thunks must dispatch an initial action, and a result action", function() {
   // {
   //     type: ModuleName/SOME_ACTION (+ STATE),

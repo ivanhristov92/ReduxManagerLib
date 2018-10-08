@@ -17,12 +17,14 @@ const _thunkFactory = _.curry(function(
           `"${actKey}" is not found in the actionTypes object`
         );
       }
-
-      if (!restApiInstance[actKey]) {
-        throw new TypeError(`"${actKey}" is not found in the restApi object`);
-      }
     }
   );
+
+  if (!restApiInstance[crudMethod]) {
+    throw new TypeError(
+      `"${actionTypeKey}" is not found in the restApi object`
+    );
+  }
 
   return function crudThunk(payload) {
     return function _thunk_(dispatch) {
@@ -58,7 +60,6 @@ const addExtendFunctionality = (function() {
 
     return Object.assign(Object.create(this), additionalProperties);
   }
-
   return function addExtendFunctionality(objectToExtend) {
     return Object.assign(Object.create({ extend }), objectToExtend);
   };
@@ -80,11 +81,10 @@ export default function actionCreatorsFactory(actionTypes, restApiInstance) {
   let thunkFactory = _thunkFactory(actionTypes, restApiInstance);
 
   let actionCreators = {
-    create: thunkFactory("create")
-    // read: thunkFactory("read"),
-    // update: thunkFactory("update"),
-    // delete: thunkFactory("delete")
+    create: thunkFactory("create"),
+    read: thunkFactory("read"),
+    update: thunkFactory("update"),
+    delete: thunkFactory("delete")
   };
-  return actionCreators;
   return addExtendFunctionality(actionCreators);
 }
