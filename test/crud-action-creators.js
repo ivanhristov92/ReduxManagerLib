@@ -102,18 +102,26 @@ describe("CRUD Action Creators", () => {
           });
         });
       });
+
+      describe("[CORRECT TYPE] - Contains an extend method", () => {
+        it("The returned object has an extend method", () => {
+          let actionCreators = actionCreatorsFactory(
+            mockActionTypes,
+            mockRestApi
+          );
+
+          assert.equal(typeof actionCreators.extend, "function");
+        });
+      });
     });
   });
 
-  describe("The object returned by the factory function must have an extend method used during model instantiation", function() {
+  describe("[RUNTIME SIGNATURE] The object returned by the factory function must have an extend method used during model instantiation", function() {
     let actionCreators;
     beforeEach(function() {
       actionCreators = actionCreatorsFactory(mockActionTypes, mockRestApi);
     });
-    it("The returned object has an extend method", () => {
-      assert.equal(typeof actionCreators.extend, "function");
-    });
-    //
+
     it("The 'extend' method returns an object", () => {
       let extendedActionCreators = actionCreators.extend({});
       assert.equal(typeof extendedActionCreators, "object");
