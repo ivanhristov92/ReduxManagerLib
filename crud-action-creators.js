@@ -69,18 +69,21 @@ const addExtendFunctionality = (function() {
   };
 })();
 
-export default function actionCreatorsFactory(actionTypes, restApiInstance) {
-  if (!actionTypes) {
+export default function actionCreatorsFactory(_actionTypes, _restApiInstance) {
+  if (!_actionTypes) {
     throw new customErrors.ModuleInitializationTypeError(
       "'actionTypes' is required as an argument"
     );
   }
 
-  if (!restApiInstance) {
+  if (!_restApiInstance) {
     throw new customErrors.ModuleInitializationTypeError(
       "'restApiInstance' is required as an argument"
     );
   }
+
+  let actionTypes = _.clone(_actionTypes);
+  let restApiInstance = _.clone(_restApiInstance);
 
   let thunkFactory = _thunkFactory(actionTypes, restApiInstance);
 

@@ -11,27 +11,34 @@ var sinon = require("sinon");
 import * as _ from "ramda";
 import { ModuleInitializationTypeError } from "../crud-error-types";
 
-const mockActionTypes = {
-  CREATE: "CREATE",
-  CREATE__SUCCESS: "CREATE__SUCCESS",
-  CREATE__FAILURE: "CREATE__FAILURE",
-  READ: "READ",
-  READ__SUCCESS: "READ__SUCCESS",
-  READ__FAILURE: "READ__FAILURE",
-  UPDATE: "UPDATE",
-  UPDATE__SUCCESS: "UPDATE__SUCCESS",
-  UPDATE__FAILURE: "UPDATE__FAILURE",
-  DELETE: "DELETE",
-  DELETE__SUCCESS: "DELETE__SUCCESS",
-  DELETE__FAILURE: "DELETE__FAILURE"
-};
+function createMocks() {
+  const mockActionTypes = {
+    CREATE: "CREATE",
+    CREATE__SUCCESS: "CREATE__SUCCESS",
+    CREATE__FAILURE: "CREATE__FAILURE",
+    READ: "READ",
+    READ__SUCCESS: "READ__SUCCESS",
+    READ__FAILURE: "READ__FAILURE",
+    UPDATE: "UPDATE",
+    UPDATE__SUCCESS: "UPDATE__SUCCESS",
+    UPDATE__FAILURE: "UPDATE__FAILURE",
+    DELETE: "DELETE",
+    DELETE__SUCCESS: "DELETE__SUCCESS",
+    DELETE__FAILURE: "DELETE__FAILURE"
+  };
 
-const mockRestApi = {
-  create() {},
-  read() {},
-  update() {},
-  delete() {}
-};
+  const mockRestApi = {
+    create() {},
+    read() {},
+    update() {},
+    delete() {}
+  };
+
+  return {
+    mockActionTypes,
+    mockRestApi
+  };
+}
 
 describe("CRUD Action Creators", () => {
   describe("[EXPORTS] The module must expose a factory function, that creates the action creators for a model", function() {
@@ -41,6 +48,8 @@ describe("CRUD Action Creators", () => {
   });
 
   describe("[MODULE INITIALIZATION SIGNATURE]", function() {
+    const { mockActionTypes, mockRestApi } = createMocks();
+
     describe("actionCreatorsFactory", () => {
       describe("[EXPECTS] 'actionTypes' must be required", () => {
         it("[THROWS] if 'actionTypes' is not provided", () => {
@@ -185,8 +194,61 @@ describe("CRUD Action Creators", () => {
   });
 
   describe("[RUNTIME SIGNATURE]", function() {
+    function dispatch() {}
+    let actionCreators;
+    let mockRestApi, mockActionTypes;
+    beforeEach(function() {
+      const mocks = createMocks();
+      mockRestApi = mocks.mockRestApi;
+      mockActionTypes = mocks.mockActionTypes;
+      actionCreators = actionCreatorsFactory(mockActionTypes, mockRestApi);
+    });
+
     describe("'create' method", () => {
-      describe("[EXPECTS] thunks must require", () => {});
+      describe("[ACCEPTS] any type of data", () => {
+        [1, " aa", {}, [], null, undefined, true, false, Infinity].forEach(
+          value => {
+            it(`does not throw when provided a ${typeof value} type: ${value}`, () => {
+              assert.doesNotThrow(() => {
+                actionCreators.create(value)(dispatch);
+              });
+            });
+          }
+        );
+      });
+      describe("[HANDLES]", () => {
+        it("does not allow the 'actionTypes' argument object to be modified from outside", () => {
+          let actionCreators = actionCreatorsFactory(
+            mockActionTypes,
+            mockRestApi
+          );
+          mockActionTypes.CREATE = "NOT_CREATE";
+          let store = { dispatch() {} };
+          sinon.spy(store, "dispatch");
+          const thunkFunction = actionCreators.create();
+          thunkFunction(store.dispatch);
+          const dispatchCall = store.dispatch.getCall(0);
+          assert.notEqual(dispatchCall.args[0].type, mockActionTypes.CREATE);
+        });
+
+        it("does not allow the 'restApi' argument object to be modified from outside", () => {
+          let actionCreators = actionCreatorsFactory(
+            mockActionTypes,
+            mockRestApi
+          );
+
+          const fakeMockRestApi = {
+            fakeCreate() {},
+            fake() {}
+          };
+          let store = { dispatch() {} };
+          sinon.spy(fakeMockRestApi, "fakeCreate");
+          mockRestApi.create = fakeMockRestApi.fakeCreate;
+          const thunkFunction = actionCreators.create();
+          thunkFunction(store.dispatch);
+          assert.equal(fakeMockRestApi.fakeCreate.getCall(0), null);
+        });
+      });
     });
 
     describe("All crud thunks must dispatch an initial action, and a result action", function() {
@@ -202,45 +264,45 @@ describe("CRUD Action Creators", () => {
       // }
       //
       // }
-      const CRUD = ["create", "read", "update"];
-      describe("[THUNK-SPECIFIC] All crud thunks dispatch an initial action", function() {
-        CRUD.forEach(crudAct => {
-          it(`"${crudAct}" should call store.dispatch at least once`, () => {
-            // 'dispatch' has been called at least once
-
-            let store = { dispatch() {} };
-            const restApi = { [crudAct]: () => Promise.resolve() };
-            const actionCreators = actionCreatorsFactory({}, restApi, store);
-
-            sinon.spy(store, "dispatch");
-            const thunkFunction = actionCreators[crudAct]();
-            thunkFunction(store.dispatch);
-
-            const dispatchCall = store.dispatch.getCall(0);
-            assert.notEqual(dispatchCall, null);
-          });
-
-          it(`"${crudAct}" should call store.dispatch firstly with a "bare" action type - without any state`, () => {
-            let store = { dispatch() {} };
-            const restApi = { [crudAct]: () => Promise.resolve() };
-            const actionTypes = actionTypesFactory("MyModel");
-            const actionCreators = actionCreatorsFactory(
-              actionTypes,
-              restApi,
-              store
-            );
-            const expectedActionType = actionTypes[crudAct.toUpperCase()];
-
-            sinon.spy(store, "dispatch");
-            const thunkFunction = actionCreators[crudAct]();
-            thunkFunction(store.dispatch);
-
-            const dispatchCall = store.dispatch.getCall(0);
-            const dispatchedAction = dispatchCall.args[0];
-            assert.equal(dispatchedAction.type, expectedActionType);
-          });
-        });
-      });
+      // const CRUD = ["create", "read", "update"];
+      // describe("[THUNK-SPECIFIC] All crud thunks dispatch an initial action", function() {
+      //   CRUD.forEach(crudAct => {
+      //     it(`"${crudAct}" should call store.dispatch at least once`, () => {
+      //       // 'dispatch' has been called at least once
+      //
+      //       let store = { dispatch() {} };
+      //       const restApi = { [crudAct]: () => Promise.resolve() };
+      //       const actionCreators = actionCreatorsFactory({}, restApi, store);
+      //
+      //       sinon.spy(store, "dispatch");
+      //       const thunkFunction = actionCreators[crudAct]();
+      //       thunkFunction(store.dispatch);
+      //
+      //       const dispatchCall = store.dispatch.getCall(0);
+      //       assert.notEqual(dispatchCall, null);
+      //     });
+      //
+      //     it(`"${crudAct}" should call store.dispatch firstly with a "bare" action type - without any state`, () => {
+      //       let store = { dispatch() {} };
+      //       const restApi = { [crudAct]: () => Promise.resolve() };
+      //       const actionTypes = actionTypesFactory("MyModel");
+      //       const actionCreators = actionCreatorsFactory(
+      //         actionTypes,
+      //         restApi,
+      //         store
+      //       );
+      //       const expectedActionType = actionTypes[crudAct.toUpperCase()];
+      //
+      //       sinon.spy(store, "dispatch");
+      //       const thunkFunction = actionCreators[crudAct]();
+      //       thunkFunction(store.dispatch);
+      //
+      //       const dispatchCall = store.dispatch.getCall(0);
+      //       const dispatchedAction = dispatchCall.args[0];
+      //       assert.equal(dispatchedAction.type, expectedActionType);
+      //     });
+      //   });
+      // });
       // describe("[THUNK-SPECIFIC] All crud thunks should dispatch a 'success' type action, when the promise resolves", function() {
       //   CRUD.forEach(crudAct => {
       //     it(`"${crudAct}" should call store.dispatch at least 2 times`, done => {
