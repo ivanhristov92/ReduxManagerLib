@@ -8,6 +8,9 @@
 import actionCreatorsFactory from "../crud-action-creators";
 var assert = require("assert");
 var sinon = require("sinon");
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+
 import * as _ from "ramda";
 import {
   ModuleInitializationTypeError,
@@ -224,10 +227,9 @@ describe("CRUD Action Creators", () => {
           mockRestApi = mocks.mockRestApi;
           mockActionTypes = mocks.mockActionTypes;
           actionCreators = actionCreatorsFactory(mockActionTypes, mockRestApi);
-
-          global.document = {
-            dispatchEvent() {}
-          };
+          const window = new JSDOM(`<!DOCTYPE html>`).window;
+          global.document = window.document;
+          global.window = window;
         });
 
         it("does not allow the 'actionTypes' argument object to be modified from outside", () => {
@@ -281,12 +283,12 @@ describe("CRUD Action Creators", () => {
           );
           // assert.doesNotThrow(function() {
           let store = { dispatch: undefined };
-          sinon.spy(global.document, "dispatchEvent");
+          sinon.spy(document, "dispatchEvent");
           const thunkFunction = actionCreators.create();
           thunkFunction(store.dispatch);
           assert.equal(
-            global.document.dispatchEvent.getCall(0).args[0].name,
-            "UnexpectedRuntimeError"
+            document.dispatchEvent.getCall(0).args[0].type,
+            "unexpectedruntimeerror"
           );
 
           // });

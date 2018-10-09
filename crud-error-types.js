@@ -11,3 +11,10 @@ export class UnexpectedRuntimeError extends Error {
     this.name = "UnexpectedRuntimeError";
   }
 }
+
+export function dispatchAnUnexpectedErrorEvent(error) {
+  let event = new window.CustomEvent("unexpectedruntimeerror", {
+    detail: new UnexpectedRuntimeError(error)
+  });
+  document.dispatchEvent(event);
+}
