@@ -51,8 +51,12 @@ const _thunkFactory = _.curry(function(
 });
 
 const addExtendFunctionality = (function() {
-  function extend(additionalProperties = {}) {
-    if (typeof additionalProperties !== "object") {
+  function extend(additionalProperties) {
+    if (
+      typeof additionalProperties !== "object" ||
+      Array.isArray(additionalProperties) ||
+      additionalProperties === null
+    ) {
       throw new TypeError(
         "Expected and object, but received " + typeof additionalProperties
       );

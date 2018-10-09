@@ -9,7 +9,6 @@ import actionCreatorsFactory from "../crud-action-creators";
 var assert = require("assert");
 var sinon = require("sinon");
 import * as _ from "ramda";
-import actionTypesFactory from "../crud-action-types";
 import { ModuleInitializationTypeError } from "../crud-error-types";
 
 const mockActionTypes = {
@@ -131,47 +130,61 @@ describe("CRUD Action Creators", () => {
         });
       });
     });
-  });
 
-  describe("[RUNTIME SIGNATURE]", function() {
     describe("'extend' method", function() {
       let actionCreators;
       beforeEach(function() {
         actionCreators = actionCreatorsFactory(mockActionTypes, mockRestApi);
       });
 
-      it("The 'extend' method returns an object", () => {
-        let extendedActionCreators = actionCreators.extend({});
-        assert.equal(typeof extendedActionCreators, "object");
+      describe("[EXPECTS] 'extend' only accepts objects", () => {
+        [1, undefined, " ", true, null, []].forEach(value => {
+          it(
+            "[THROWS] throws if it is provided a " +
+              typeof value +
+              ": " +
+              value,
+            () => {
+              assert.throws(function() {
+                actionCreators.extend(value);
+              });
+            }
+          );
+        });
       });
 
-      it("The 'extend' method adds new action creators to the object", () => {
-        let extendedActionCreators = actionCreators.extend({ testAction() {} });
-        assert.equal(_.has("testAction", extendedActionCreators), true);
-      });
+      describe("[RETURNS]", () => {
+        describe("[CORRECT TYPE] The 'extend' method must return a new object with the added action creators", () => {
+          it("The 'extend' method returns an object", () => {
+            let extendedActionCreators = actionCreators.extend({});
+            assert.equal(typeof extendedActionCreators, "object");
+          });
 
-      it("The 'extend' method does not modify the original object", () => {
-        let actionCreatorsBackup = actionCreatorsFactory(
-          mockActionTypes,
-          mockRestApi
-        );
+          it("The 'extend' method adds new action creators to the object", () => {
+            let extendedActionCreators = actionCreators.extend({
+              testAction() {}
+            });
+            assert.equal(_.has("testAction", extendedActionCreators), true);
+          });
 
-        actionCreators.extend({ testAction() {} });
-        assert.deepEqual(_.keys(actionCreators), _.keys(actionCreatorsBackup));
+          it("The 'extend' method does not modify the original object", () => {
+            let actionCreatorsBackup = actionCreatorsFactory(
+              mockActionTypes,
+              mockRestApi
+            );
+
+            actionCreators.extend({ testAction() {} });
+            assert.deepEqual(
+              _.keys(actionCreators),
+              _.keys(actionCreatorsBackup)
+            );
+          });
+        });
       });
-      //   it("The 'extend' method accepts an object only and THROWS otherwise", () => {
-      //     let actionCreators = actionCreatorsFactory({}, {});
-      //
-      //     assert.throws(function testNonObjects() {
-      //       actionCreators.extend(undefined);
-      //       actionCreators.extend(null);
-      //       actionCreators.extend(10);
-      //       actionCreators.extend(false);
-      //       actionCreators.extend([]);
-      //     }, Error);
-      //   });
     });
   });
+
+  describe("[RUNTIME SIGNATURE]", function() {});
   // describe("[THUNK-SPECIFIC] All crud thunks must dispatch an initial action, and a result action", function() {
   // {
   //     type: ModuleName/SOME_ACTION (+ STATE),
