@@ -1,5 +1,6 @@
 import * as _ from "ramda";
 import * as customErrors from "./crud-error-types";
+import { UnexpectedRuntimeError } from "./crud-error-types";
 
 const _thunkFactory = _.curry(function(
   actionTypes,
@@ -45,6 +46,7 @@ const _thunkFactory = _.curry(function(
           });
       } catch (error) {
         // emit a global error event
+        document.dispatchEvent(new UnexpectedRuntimeError(error));
       }
     };
   };

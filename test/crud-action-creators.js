@@ -9,34 +9,35 @@ import actionCreatorsFactory from "../crud-action-creators";
 var assert = require("assert");
 var sinon = require("sinon");
 import * as _ from "ramda";
-import { ModuleInitializationTypeError } from "../crud-error-types";
+import {
+  ModuleInitializationTypeError,
+  UnexpectedRuntimeError
+} from "../crud-error-types";
 
 function createMocks() {
-  const mockActionTypes = {
-    CREATE: "CREATE",
-    CREATE__SUCCESS: "CREATE__SUCCESS",
-    CREATE__FAILURE: "CREATE__FAILURE",
-    READ: "READ",
-    READ__SUCCESS: "READ__SUCCESS",
-    READ__FAILURE: "READ__FAILURE",
-    UPDATE: "UPDATE",
-    UPDATE__SUCCESS: "UPDATE__SUCCESS",
-    UPDATE__FAILURE: "UPDATE__FAILURE",
-    DELETE: "DELETE",
-    DELETE__SUCCESS: "DELETE__SUCCESS",
-    DELETE__FAILURE: "DELETE__FAILURE"
-  };
-
-  const mockRestApi = {
-    create() {},
-    read() {},
-    update() {},
-    delete() {}
-  };
-
   return {
-    mockActionTypes,
-    mockRestApi
+    mockActionTypes: {
+      CREATE: "CREATE",
+      CREATE__SUCCESS: "CREATE__SUCCESS",
+      CREATE__FAILURE: "CREATE__FAILURE",
+      READ: "READ",
+      READ__SUCCESS: "READ__SUCCESS",
+      READ__FAILURE: "READ__FAILURE",
+      UPDATE: "UPDATE",
+      UPDATE__SUCCESS: "UPDATE__SUCCESS",
+      UPDATE__FAILURE: "UPDATE__FAILURE",
+      DELETE: "DELETE",
+      DELETE__SUCCESS: "DELETE__SUCCESS",
+      DELETE__FAILURE: "DELETE__FAILURE"
+    },
+    mockRestApi: {
+      create() {
+        return new Promise((resolve, reject) => {});
+      },
+      read() {},
+      update() {},
+      delete() {}
+    }
   };
 }
 
@@ -223,6 +224,10 @@ describe("CRUD Action Creators", () => {
           mockRestApi = mocks.mockRestApi;
           mockActionTypes = mocks.mockActionTypes;
           actionCreators = actionCreatorsFactory(mockActionTypes, mockRestApi);
+
+          global.document = {
+            dispatchEvent() {}
+          };
         });
 
         it("does not allow the 'actionTypes' argument object to be modified from outside", () => {
@@ -255,6 +260,36 @@ describe("CRUD Action Creators", () => {
           const thunkFunction = actionCreators.create();
           thunkFunction(store.dispatch);
           assert.equal(fakeMockRestApi.fakeCreate.getCall(0), null);
+        });
+
+        it("does not throw if not provided with a 'dispatch' function", () => {
+          let actionCreators = actionCreatorsFactory(
+            mockActionTypes,
+            mockRestApi
+          );
+          assert.doesNotThrow(function() {
+            let store = { dispatch: undefined };
+            const thunkFunction = actionCreators.create();
+            thunkFunction(store.dispatch);
+          });
+        });
+
+        it("emits an UnexpectedRuntimeError error", () => {
+          let actionCreators = actionCreatorsFactory(
+            mockActionTypes,
+            mockRestApi
+          );
+          // assert.doesNotThrow(function() {
+          let store = { dispatch: undefined };
+          sinon.spy(global.document, "dispatchEvent");
+          const thunkFunction = actionCreators.create();
+          thunkFunction(store.dispatch);
+          assert.equal(
+            global.document.dispatchEvent.getCall(0).args[0].name,
+            "UnexpectedRuntimeError"
+          );
+
+          // });
         });
       });
     });
