@@ -133,43 +133,44 @@ describe("CRUD Action Creators", () => {
     });
   });
 
-  describe("[RUNTIME SIGNATURE] The object returned by the factory function must have an extend method used during model instantiation", function() {
-    let actionCreators;
-    beforeEach(function() {
-      actionCreators = actionCreatorsFactory(mockActionTypes, mockRestApi);
+  describe("[RUNTIME SIGNATURE]", function() {
+    describe("'extend' method", function() {
+      let actionCreators;
+      beforeEach(function() {
+        actionCreators = actionCreatorsFactory(mockActionTypes, mockRestApi);
+      });
+
+      it("The 'extend' method returns an object", () => {
+        let extendedActionCreators = actionCreators.extend({});
+        assert.equal(typeof extendedActionCreators, "object");
+      });
+
+      it("The 'extend' method adds new action creators to the object", () => {
+        let extendedActionCreators = actionCreators.extend({ testAction() {} });
+        assert.equal(_.has("testAction", extendedActionCreators), true);
+      });
+
+      it("The 'extend' method does not modify the original object", () => {
+        let actionCreatorsBackup = actionCreatorsFactory(
+          mockActionTypes,
+          mockRestApi
+        );
+
+        actionCreators.extend({ testAction() {} });
+        assert.deepEqual(_.keys(actionCreators), _.keys(actionCreatorsBackup));
+      });
+      //   it("The 'extend' method accepts an object only and THROWS otherwise", () => {
+      //     let actionCreators = actionCreatorsFactory({}, {});
+      //
+      //     assert.throws(function testNonObjects() {
+      //       actionCreators.extend(undefined);
+      //       actionCreators.extend(null);
+      //       actionCreators.extend(10);
+      //       actionCreators.extend(false);
+      //       actionCreators.extend([]);
+      //     }, Error);
+      //   });
     });
-
-    it("The 'extend' method returns an object", () => {
-      let extendedActionCreators = actionCreators.extend({});
-      assert.equal(typeof extendedActionCreators, "object");
-    });
-
-    it("The 'extend' method adds new action creators to the object", () => {
-      let extendedActionCreators = actionCreators.extend({ testAction() {} });
-      assert.equal(_.has("testAction", extendedActionCreators), true);
-    });
-
-    it("The 'extend' method does not modify the original object", () => {
-      let actionCreatorsBackup = actionCreatorsFactory(
-        mockActionTypes,
-        mockRestApi
-      );
-
-      actionCreators.extend({ testAction() {} });
-      assert.deepEqual(_.keys(actionCreators), _.keys(actionCreatorsBackup));
-    });
-
-    //   it("The 'extend' method accepts an object only and THROWS otherwise", () => {
-    //     let actionCreators = actionCreatorsFactory({}, {});
-    //
-    //     assert.throws(function testNonObjects() {
-    //       actionCreators.extend(undefined);
-    //       actionCreators.extend(null);
-    //       actionCreators.extend(10);
-    //       actionCreators.extend(false);
-    //       actionCreators.extend([]);
-    //     }, Error);
-    //   });
   });
   // describe("[THUNK-SPECIFIC] All crud thunks must dispatch an initial action, and a result action", function() {
   // {
