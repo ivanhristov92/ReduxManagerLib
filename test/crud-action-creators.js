@@ -41,76 +41,93 @@ describe("CRUD Action Creators", () => {
     });
   });
 
-  describe("[MODULE INITIALIZATION SIGNATURE] The module factory function must require 'actionTypes' and 'restApi' as arguments", function() {
-    describe("[EXPECTS] 'actionTypes' must be required", () => {
-      it("[THROWS] if 'actionTypes' is not provided", () => {
-        assert.throws(function() {
-          actionCreatorsFactory(null, {}, {});
-        }, Error);
-      });
-
-      it("[THROWS] throws a ModuleInitializationTypeError if 'actionTypes' is not provided", () => {
-        try {
-          actionCreatorsFactory(null, {}, {});
-        } catch (err) {
-          assert.equal(err.name, "ModuleInitializationTypeError");
-        }
-      });
-    });
-
-    describe("[EXPECTS] 'restApi' must be required", () => {
-      it("[THROWS] if 'restApi' is not provided", () => {
-        assert.throws(function() {
-          actionCreatorsFactory({}, null, {});
-        }, Error);
-      });
-
-      it("[THROWS] throws a ModuleInitializationTypeError if 'restApi' is not provided", () => {
-        try {
-          actionCreatorsFactory({}, null, {});
-          throw new Error("should have thrown");
-        } catch (err) {
-          assert.equal(err.name, "ModuleInitializationTypeError");
-        }
-      });
-    });
-
-    describe("[RETURNS] the factory function returns:", () => {
-      describe("[CORRECT TYPE] The factory function must return an object with the action creators", () => {
-        let actionCreators;
-        beforeEach(function() {
-          actionCreators = actionCreatorsFactory(mockActionTypes, mockRestApi);
+  describe("[MODULE INITIALIZATION SIGNATURE]", function() {
+    describe("actionCreatorsFactory", () => {
+      describe("[EXPECTS] 'actionTypes' must be required", () => {
+        it("[THROWS] if 'actionTypes' is not provided", () => {
+          assert.throws(function() {
+            actionCreatorsFactory(null, {});
+          }, Error);
         });
 
-        it("returns an object", () => {
-          assert.equal(typeof actionCreators, "object");
+        it("[THROWS] throws a ModuleInitializationTypeError if 'actionTypes' is not provided", () => {
+          try {
+            actionCreatorsFactory(null, {});
+          } catch (err) {
+            assert.equal(err.name, "ModuleInitializationTypeError");
+          }
         });
 
-        it("returns a non-empty object", () => {
-          assert.equal(_.isEmpty(actionCreators), false);
-        });
-
-        ["create", "read", "update", "delete"].forEach(crudAct => {
-          const propNotFound = " property was not found";
-          it(`returns an object with a '${crudAct}' function`, () => {
-            assert.equal(
-              _.has(crudAct, actionCreators),
-              true,
-              `${crudAct} ${propNotFound}`
-            );
-            assert.equal(typeof actionCreators[crudAct], "function");
+        it("[ACCEPTS][CORRECT TYPE] accepts an ActionTypes object for 'actionTypes'", () => {
+          assert.doesNotThrow(function() {
+            actionCreatorsFactory(mockActionTypes, mockRestApi);
           });
         });
       });
 
-      describe("[CORRECT TYPE] - Contains an extend method", () => {
-        it("The returned object has an extend method", () => {
-          let actionCreators = actionCreatorsFactory(
-            mockActionTypes,
-            mockRestApi
-          );
+      describe("[EXPECTS] 'restApi' must be required", () => {
+        it("[THROWS] if 'restApi' is not provided", () => {
+          assert.throws(function() {
+            actionCreatorsFactory({}, null, {});
+          }, Error);
+        });
 
-          assert.equal(typeof actionCreators.extend, "function");
+        it("[THROWS] throws a ModuleInitializationTypeError if 'restApi' is not provided", () => {
+          try {
+            actionCreatorsFactory({}, null, {});
+            throw new Error("should have thrown");
+          } catch (err) {
+            assert.equal(err.name, "ModuleInitializationTypeError");
+          }
+        });
+
+        it("[ACCEPTS][CORRECT TYPE] accepts an ActionTypes object for 'actionTypes'", () => {
+          assert.doesNotThrow(function() {
+            actionCreatorsFactory(mockActionTypes, mockRestApi);
+          });
+        });
+      });
+
+      describe("[RETURNS] the factory function returns:", () => {
+        describe("[CORRECT TYPE] The factory function must return an object with the action creators", () => {
+          let actionCreators;
+          beforeEach(function() {
+            actionCreators = actionCreatorsFactory(
+              mockActionTypes,
+              mockRestApi
+            );
+          });
+
+          it("returns an object", () => {
+            assert.equal(typeof actionCreators, "object");
+          });
+
+          it("returns a non-empty object", () => {
+            assert.equal(_.isEmpty(actionCreators), false);
+          });
+
+          ["create", "read", "update", "delete"].forEach(crudAct => {
+            const propNotFound = " property was not found";
+            it(`returns an object with a '${crudAct}' function`, () => {
+              assert.equal(
+                _.has(crudAct, actionCreators),
+                true,
+                `${crudAct} ${propNotFound}`
+              );
+              assert.equal(typeof actionCreators[crudAct], "function");
+            });
+          });
+        });
+
+        describe("[CORRECT TYPE] - Contains an extend method", () => {
+          it("The returned object has an extend method", () => {
+            let actionCreators = actionCreatorsFactory(
+              mockActionTypes,
+              mockRestApi
+            );
+
+            assert.equal(typeof actionCreators.extend, "function");
+          });
         });
       });
     });
@@ -141,7 +158,7 @@ describe("CRUD Action Creators", () => {
       actionCreators.extend({ testAction() {} });
       assert.deepEqual(_.keys(actionCreators), _.keys(actionCreatorsBackup));
     });
-    //
+
     //   it("The 'extend' method accepts an object only and THROWS otherwise", () => {
     //     let actionCreators = actionCreatorsFactory({}, {});
     //
