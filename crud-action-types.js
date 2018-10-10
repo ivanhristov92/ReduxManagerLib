@@ -1,6 +1,13 @@
 import * as _ from "ramda";
+import { ModuleInitializationTypeError } from "./crud-error-types";
 
 export default function actionTypesFactory(modelName) {
+  if (typeof modelName !== "string" || modelName === "") {
+    throw new ModuleInitializationTypeError(
+      `'modelName' is required to be a non-empty string, instead got ${typeof modelName} : ${modelName}`
+    );
+  }
+
   const addModelName = _.map(actionTypeValue => {
     return `${modelName}/${actionTypeValue}`;
   });
@@ -21,8 +28,20 @@ export default function actionTypesFactory(modelName) {
   });
   function createExtendableActionTypes() {
     const extendFunctionalityProto = {
-      extend: function extendActionTypes(additionalActionTypes = {}) {
+      extend: function extendActionTypes(additionalActionTypes) {
+        if (!additionalActionTypes) {
+          throw new TypeError(
+            "Expected and object, but received " + typeof additionalActionTypes
+          );
+        }
+
         if (typeof additionalActionTypes !== "object") {
+          throw new TypeError(
+            "Expected and object, but received " + typeof additionalActionTypes
+          );
+        }
+
+        if (Array.isArray(additionalActionTypes)) {
           throw new TypeError(
             "Expected and object, but received " + typeof additionalActionTypes
           );
