@@ -1,11 +1,13 @@
 import * as _ from "ramda";
-import * as customErrors from "./crud-error-types";
 import {
-  UnexpectedRuntimeError,
-  dispatchAnUnexpectedErrorEvent
+  dispatchAnUnexpectedErrorEvent,
+  ModuleInitializationTypeError
 } from "./crud-error-types";
-
 import { addExtendFunctionality } from "./utils";
+
+//////////////////////////////////////////////////////
+////// INTERNAL THUNK FACTORY ////////////////////////
+//////////////////////////////////////////////////////
 
 const _thunkFactory = _.curry(function(
   actionTypes,
@@ -57,15 +59,19 @@ const _thunkFactory = _.curry(function(
   };
 });
 
+/////////////////////////////////////////////////////////////////////
+////// ACTION CREATORS FACTORY //////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+
 export default function actionCreatorsFactory(_actionTypes, _restApiInstance) {
   if (!_actionTypes) {
-    throw new customErrors.ModuleInitializationTypeError(
+    throw new ModuleInitializationTypeError(
       "'actionTypes' is required as an argument"
     );
   }
 
   if (!_restApiInstance) {
-    throw new customErrors.ModuleInitializationTypeError(
+    throw new ModuleInitializationTypeError(
       "'restApiInstance' is required as an argument"
     );
   }
