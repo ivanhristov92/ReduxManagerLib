@@ -214,96 +214,105 @@ describe("CRUD Action Creators", () => {
     let actionCreators;
     let mockRestApi, mockActionTypes;
 
-    describe("'create' method", () => {
-      beforeEach(function() {
-        const mocks = createMocks();
-        mockRestApi = mocks.mockRestApi;
-        mockActionTypes = mocks.mockActionTypes;
-        actionCreators = actionCreatorsFactory(mockActionTypes, mockRestApi);
-      });
-
-      describe("[ACCEPTS] any type of data", () => {
-        [1, " aa", {}, [], null, undefined, true, false, Infinity].forEach(
-          value => {
-            it(`does not throw when provided a ${typeof value} type: ${value}`, () => {
-              assert.doesNotThrow(() => {
-                actionCreators.create(value)(dispatch);
-              });
-            });
-          }
-        );
-      });
-      describe("[HANDLES]", () => {
+    ["create", "read", "update", "delete"].forEach(crudAct => {
+      describe(`${crudAct}' method`, () => {
         beforeEach(function() {
           const mocks = createMocks();
           mockRestApi = mocks.mockRestApi;
           mockActionTypes = mocks.mockActionTypes;
           actionCreators = actionCreatorsFactory(mockActionTypes, mockRestApi);
-          const window = new JSDOM(`<!DOCTYPE html>`).window;
-          global.document = window.document;
-          global.window = window;
         });
 
-        it("does not allow the 'actionTypes' argument object to be modified from outside", () => {
-          let actionCreators = actionCreatorsFactory(
-            mockActionTypes,
-            mockRestApi
+        describe("[ACCEPTS] any type of data", () => {
+          [1, " aa", {}, [], null, undefined, true, false, Infinity].forEach(
+            value => {
+              it(`does not throw when provided a ${typeof value} type: ${value}`, () => {
+                assert.doesNotThrow(() => {
+                  actionCreators[crudAct](value)(dispatch);
+                });
+              });
+            }
           );
-          mockActionTypes.CREATE = "NOT_CREATE";
-          let store = { dispatch() {} };
-          sinon.spy(store, "dispatch");
-          const thunkFunction = actionCreators.create();
-          thunkFunction(store.dispatch);
-          const dispatchCall = store.dispatch.getCall(0);
-          assert.notEqual(dispatchCall.args[0].type, mockActionTypes.CREATE);
         });
-
-        it("does not allow the 'restApi' argument object to be modified from outside", () => {
-          let actionCreators = actionCreatorsFactory(
-            mockActionTypes,
-            mockRestApi
-          );
-
-          const fakeMockRestApi = {
-            fakeCreate() {},
-            fake() {}
-          };
-          let store = { dispatch() {} };
-          sinon.spy(fakeMockRestApi, "fakeCreate");
-          mockRestApi.create = fakeMockRestApi.fakeCreate;
-          const thunkFunction = actionCreators.create();
-          thunkFunction(store.dispatch);
-          assert.equal(fakeMockRestApi.fakeCreate.getCall(0), null);
-        });
-
-        it("does not throw if not provided with a 'dispatch' function", () => {
-          let actionCreators = actionCreatorsFactory(
-            mockActionTypes,
-            mockRestApi
-          );
-          assert.doesNotThrow(function() {
-            let store = { dispatch: undefined };
-            const thunkFunction = actionCreators.create();
-            thunkFunction(store.dispatch);
+        describe("[HANDLES]", () => {
+          beforeEach(function() {
+            const mocks = createMocks();
+            mockRestApi = mocks.mockRestApi;
+            mockActionTypes = mocks.mockActionTypes;
+            actionCreators = actionCreatorsFactory(
+              mockActionTypes,
+              mockRestApi
+            );
+            const window = new JSDOM(`<!DOCTYPE html>`).window;
+            global.document = window.document;
+            global.window = window;
           });
-        });
 
-        it("[EMITS] emits an UnexpectedRuntimeError error if 'dispatch' is undefined", () => {
-          let actionCreators = actionCreatorsFactory(
-            mockActionTypes,
-            mockRestApi
-          );
-          // assert.doesNotThrow(function() {
-          let store = { dispatch: undefined };
-          sinon.spy(document, "dispatchEvent");
-          const thunkFunction = actionCreators.create();
-          thunkFunction(store.dispatch);
-          assert.equal(
-            document.dispatchEvent.getCall(0).args[0].type,
-            "unexpectedruntimeerror"
-          );
+          it("does not allow the 'actionTypes' argument object to be modified from outside", () => {
+            let actionCreators = actionCreatorsFactory(
+              mockActionTypes,
+              mockRestApi
+            );
+            mockActionTypes[
+              crudAct.toUpperCase()
+            ] = `NOT_${crudAct.toUpperCase()}`;
+            let store = { dispatch() {} };
+            sinon.spy(store, "dispatch");
+            const thunkFunction = actionCreators[crudAct]();
+            thunkFunction(store.dispatch);
+            const dispatchCall = store.dispatch.getCall(0);
+            assert.notEqual(
+              dispatchCall.args[0].type,
+              mockActionTypes[crudAct.toUpperCase()]
+            );
+          });
 
-          // });
+          it("does not allow the 'restApi' argument object to be modified from outside", () => {
+            let actionCreators = actionCreatorsFactory(
+              mockActionTypes,
+              mockRestApi
+            );
+
+            const fakeMockRestApi = {
+              fakeCrudAct() {}
+            };
+            let store = { dispatch() {} };
+            sinon.spy(fakeMockRestApi, "fakeCrudAct");
+            mockRestApi[crudAct] = fakeMockRestApi.fakeCrudAct;
+            const thunkFunction = actionCreators[crudAct]();
+            thunkFunction(store.dispatch);
+            assert.equal(fakeMockRestApi.fakeCrudAct.getCall(0), null);
+          });
+
+          it("does not throw if not provided with a 'dispatch' function", () => {
+            let actionCreators = actionCreatorsFactory(
+              mockActionTypes,
+              mockRestApi
+            );
+            assert.doesNotThrow(function() {
+              let store = { dispatch: undefined };
+              const thunkFunction = actionCreators[crudAct]();
+              thunkFunction(store.dispatch);
+            });
+          });
+
+          it("[EMITS] emits an UnexpectedRuntimeError error if 'dispatch' is undefined", () => {
+            let actionCreators = actionCreatorsFactory(
+              mockActionTypes,
+              mockRestApi
+            );
+            // assert.doesNotThrow(function() {
+            let store = { dispatch: undefined };
+            sinon.spy(document, "dispatchEvent");
+            const thunkFunction = actionCreators[crudAct]();
+            thunkFunction(store.dispatch);
+            assert.equal(
+              document.dispatchEvent.getCall(0).args[0].type,
+              "unexpectedruntimeerror"
+            );
+
+            // });
+          });
         });
       });
     });
