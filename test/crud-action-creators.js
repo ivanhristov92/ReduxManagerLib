@@ -17,7 +17,13 @@ import {
   UnexpectedRuntimeError
 } from "../crud-error-types";
 
-function createMocks() {
+function createMocks(restApiRejects = false) {
+  function testPromise() {
+    return new Promise((resolve, reject) => {
+      restApiRejects ? reject({ test: false }) : resolve({ test: true });
+    });
+  }
+
   return {
     mockActionTypes: {
       CREATE: "CREATE",
@@ -35,24 +41,16 @@ function createMocks() {
     },
     mockRestApi: {
       create() {
-        return new Promise((resolve, reject) => {
-          resolve();
-        });
+        return testPromise();
       },
       read() {
-        return new Promise((resolve, reject) => {
-          resolve();
-        });
+        return testPromise();
       },
       update() {
-        return new Promise((resolve, reject) => {
-          resolve();
-        });
+        return testPromise();
       },
       delete() {
-        return new Promise((resolve, reject) => {
-          resolve();
-        });
+        return testPromise();
       }
     }
   };
@@ -313,7 +311,7 @@ describe("CRUD Action Creators", () => {
 
   describe("[OPERATION]", () => {
     describe("[THUNK-SPECIFIC] All crud thunks must dispatch an initial action, and a result action", function() {
-      ["create"].forEach(crudAct => {
+      ["create", "read", "update", "delete"].forEach(crudAct => {
         describe(crudAct, () => {
           describe(`${crudAct} must fire an initial action`, () => {
             let actionCreators;
@@ -350,6 +348,62 @@ describe("CRUD Action Creators", () => {
               const dispatchCall = store.dispatch.getCall(0);
               const dispatchedAction = dispatchCall.args[0];
               assert.equal(dispatchedAction.type, expectedActionType);
+            });
+
+            it(`"${crudAct}" should carry the payload on the initial action`, () => {
+              let store = { dispatch() {} };
+              let someTestPayload = { testPayload: true };
+
+              sinon.spy(store, "dispatch");
+              const thunkFunction = actionCreators[crudAct](someTestPayload);
+              thunkFunction(store.dispatch);
+
+              const dispatchCall = store.dispatch.getCall(0);
+              const dispatchedAction = dispatchCall.args[0];
+              assert.deepEqual(dispatchedAction.payload, someTestPayload);
+            });
+          });
+
+          describe(`${crudAct} must call the correct rest api call`, () => {
+            it(`"${crudAct}" should call the corresponding rest api method`, done => {
+              let { mockActionTypes, mockRestApi } = createMocks();
+              sinon.spy(mockRestApi, crudAct);
+
+              let actionCreators = actionCreatorsFactory(
+                mockActionTypes,
+                mockRestApi
+              );
+
+              let store = { dispatch() {} };
+              let someTestPayload = { testPayload: true };
+
+              const thunkFunction = actionCreators[crudAct](someTestPayload);
+              thunkFunction(store.dispatch).then(function() {
+                const restCall = mockRestApi[crudAct].getCall(0);
+                assert.notEqual(restCall, null);
+                done();
+              });
+            });
+
+            it(`"${crudAct}" should call the corresponding rest api method with the payload as an argument`, done => {
+              let { mockActionTypes, mockRestApi } = createMocks();
+              sinon.spy(mockRestApi, crudAct);
+
+              let actionCreators = actionCreatorsFactory(
+                mockActionTypes,
+                mockRestApi
+              );
+
+              let store = { dispatch() {} };
+              let someTestPayload = { testPayload: true };
+
+              const thunkFunction = actionCreators[crudAct](someTestPayload);
+              thunkFunction(store.dispatch).then(function() {
+                const restCall = mockRestApi[crudAct].getCall(0);
+                const restCallArgument = restCall.args[0];
+                assert.deepEqual(restCallArgument, someTestPayload);
+                done();
+              });
             });
           });
 
@@ -394,11 +448,23 @@ describe("CRUD Action Creators", () => {
                 done();
               });
             });
+
+            it(`"${crudAct}" should carry the payload on the 'success' action`, done => {
+              let store = { dispatch() {} };
+              sinon.spy(store, "dispatch");
+              const thunkFunction = actionCreators[crudAct]();
+              thunkFunction(store.dispatch).then(function() {
+                const dispatchCall = store.dispatch.getCall(1);
+                const dispatchedAction = dispatchCall.args[0];
+                assert.deepEqual(dispatchedAction.payload, { test: true });
+                done();
+              });
+            });
           });
 
           describe(`${crudAct} must fire a 'failure' type action, when the promise rejects`, function() {
             let actionCreators;
-            const { mockActionTypes, mockRestApi } = createMocks();
+            const { mockActionTypes, mockRestApi } = createMocks(true);
 
             beforeEach(function() {
               actionCreators = actionCreatorsFactory(
@@ -424,153 +490,21 @@ describe("CRUD Action Creators", () => {
                 done();
               });
             });
+
+            it(`"${crudAct}" should carry the error on the 'failure' action`, done => {
+              let store = { dispatch() {} };
+
+              sinon.spy(store, "dispatch");
+              const thunkFunction = actionCreators[crudAct]();
+              thunkFunction(store.dispatch).then(function() {
+                const dispatchCall = store.dispatch.getCall(1);
+                const dispatchedAction = dispatchCall.args[0];
+                assert.deepEqual(dispatchedAction.error, { test: false });
+                done();
+              });
+            });
           });
         });
-      });
-
-      describe("All action creators must fire an initial action", () => {
-        let actionCreators;
-        const { mockActionTypes, mockRestApi } = createMocks();
-
-        beforeEach(function() {
-          actionCreators = actionCreatorsFactory(mockActionTypes, mockRestApi);
-        });
-        // const CRUD = ["create", "read", "update"];
-
-        // describe("[THUNK-SPECIFIC] All crud thunks should dispatch a 'success' type action, when the promise resolves", function() {
-        //   CRUD.forEach(crudAct => {
-
-        // it(`"${crudAct}" should call store.dispatch with a 'failure' action type the second time, when the promise rejects`, done => {
-        //   let store = { dispatch() {} };
-        //   const restApi = { [crudAct]: () => Promise.reject() };
-        //   const actionTypes = actionTypesFactory("MyModel");
-        //   const actionCreators = actionCreatorsFactory(
-        //     actionTypes,
-        //     restApi,
-        //     store
-        //   );
-        //   const expectedActionType =
-        //     actionTypes[crudAct.toUpperCase() + "__FAILURE"];
-        //
-        //   sinon.spy(store, "dispatch");
-        //   const thunkFunction = actionCreators[crudAct]();
-        //
-        //   thunkFunction(store.dispatch).then(() => {
-        //     const dispatchCall = store.dispatch.getCall(1);
-        //     const dispatchedAction = dispatchCall.args[0];
-        //     assert.notEqual(typeof dispatchedAction.type, "undefined");
-        //     assert.equal(dispatchedAction.type, expectedActionType);
-        //     done();
-        //   });
-        // });
-        // });
-        // });
-        //   describe("[THUNK-SPECIFIC] All crud  action types should carry the payload passed to them", function() {
-        //     CRUD.forEach(crudAct => {
-        //       it(`"${crudAct}" should carry the payload on the initial action`, () => {
-        //         let store = { dispatch() {} };
-        //         let someTestPayload = { testPayload: true };
-        //
-        //         const restApi = {
-        //           [crudAct]: () => {
-        //             return Promise.resolve();
-        //           }
-        //         };
-        //
-        //         const actionCreators = actionCreatorsFactory(
-        //           { [crudAct.toUpperCase()]: crudAct.toUpperCase() },
-        //           restApi,
-        //           store
-        //         );
-        //
-        //         sinon.spy(store, "dispatch");
-        //         const thunkFunction = actionCreators[crudAct](someTestPayload);
-        //         thunkFunction(store.dispatch);
-        //
-        //         const dispatchCall = store.dispatch.getCall(0);
-        //         const dispatchedAction = dispatchCall.args[0];
-        //         assert.deepEqual(dispatchedAction.payload, someTestPayload);
-        //       });
-        //
-        //       it(`"${crudAct}" should carry the payload on the 'success' action`, done => {
-        //         let store = { dispatch() {} };
-        //         let someTestPayload = { testPayload: true };
-        //
-        //         const restApi = {
-        //           [crudAct]: () => {
-        //             return Promise.resolve(someTestPayload);
-        //           }
-        //         };
-        //
-        //         const actionCreators = actionCreatorsFactory(
-        //           { [crudAct.toUpperCase()]: crudAct.toUpperCase() },
-        //           restApi,
-        //           store
-        //         );
-        //
-        //         sinon.spy(store, "dispatch");
-        //         const thunkFunction = actionCreators[crudAct]();
-        //         thunkFunction(store.dispatch).then(function() {
-        //           const dispatchCall = store.dispatch.getCall(1);
-        //           const dispatchedAction = dispatchCall.args[0];
-        //           assert.deepEqual(dispatchedAction.payload, someTestPayload);
-        //           done();
-        //         });
-        //       });
-        //
-        //       it(`"${crudAct}" should carry the error on the 'failure' action`, done => {
-        //         let store = { dispatch() {} };
-        //         let testError = new Error("Test Error");
-        //
-        //         const restApi = {
-        //           [crudAct]: () => {
-        //             return Promise.reject(new Error("Test Error"));
-        //           }
-        //         };
-        //
-        //         const actionCreators = actionCreatorsFactory(
-        //           { [crudAct.toUpperCase()]: crudAct.toUpperCase() },
-        //           restApi,
-        //           store
-        //         );
-        //
-        //         sinon.spy(store, "dispatch");
-        //         const thunkFunction = actionCreators[crudAct]();
-        //         thunkFunction(store.dispatch).then(function() {
-        //           const dispatchCall = store.dispatch.getCall(1);
-        //           const dispatchedAction = dispatchCall.args[0];
-        //           assert.deepEqual(dispatchedAction.error, testError);
-        //           done();
-        //         });
-        //       });
-        //
-        //       it(`"${crudAct}" should call the corresponding rest api method with the payload as an argument`, done => {
-        //         let store = { dispatch() {} };
-        //         let someTestPayload = { testPayload: true };
-        //
-        //         const restApi = {
-        //           [crudAct]: () => {
-        //             return Promise.resolve();
-        //           }
-        //         };
-        //
-        //         const actionCreators = actionCreatorsFactory(
-        //           { [crudAct.toUpperCase()]: crudAct.toUpperCase() },
-        //           restApi,
-        //           store
-        //         );
-        //
-        //         sinon.spy(restApi, crudAct);
-        //         const thunkFunction = actionCreators[crudAct](someTestPayload);
-        //         thunkFunction(store.dispatch).then(function() {
-        //           const restCall = restApi[crudAct].getCall(0);
-        //           const restCallArgument = restCall.args[0];
-        //           assert.deepEqual(restCallArgument, someTestPayload);
-        //           done();
-        //         });
-        //       });
-        //     });
-        //   });
       });
     });
   });
