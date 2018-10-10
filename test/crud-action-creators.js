@@ -12,18 +12,9 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
 import * as _ from "ramda";
-import {
-  ModuleInitializationTypeError,
-  UnexpectedRuntimeError
-} from "../crud-error-types";
+import { ModuleInitializationTypeError } from "../crud-error-types";
 
 function createMocks(restApiRejects = false) {
-  function testPromise() {
-    return new Promise((resolve, reject) => {
-      restApiRejects ? reject({ test: false }) : resolve({ test: true });
-    });
-  }
-
   return {
     mockActionTypes: {
       CREATE: "CREATE",
@@ -54,6 +45,12 @@ function createMocks(restApiRejects = false) {
       }
     }
   };
+
+  function testPromise() {
+    return new Promise((resolve, reject) => {
+      restApiRejects ? reject({ test: false }) : resolve({ test: true });
+    });
+  }
 }
 
 describe("CRUD Action Creators", () => {

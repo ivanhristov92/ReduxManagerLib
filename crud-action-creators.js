@@ -5,6 +5,8 @@ import {
   dispatchAnUnexpectedErrorEvent
 } from "./crud-error-types";
 
+import { addExtendFunctionality } from "./utils";
+
 const _thunkFactory = _.curry(function(
   actionTypes,
   restApiInstance,
@@ -54,25 +56,6 @@ const _thunkFactory = _.curry(function(
     };
   };
 });
-
-const addExtendFunctionality = (function() {
-  function extend(additionalProperties) {
-    if (
-      typeof additionalProperties !== "object" ||
-      Array.isArray(additionalProperties) ||
-      additionalProperties === null
-    ) {
-      throw new TypeError(
-        "Expected and object, but received " + typeof additionalProperties
-      );
-    }
-
-    return Object.assign(Object.create(this), additionalProperties);
-  }
-  return function addExtendFunctionality(objectToExtend) {
-    return Object.assign(Object.create({ extend }), objectToExtend);
-  };
-})();
 
 export default function actionCreatorsFactory(_actionTypes, _restApiInstance) {
   if (!_actionTypes) {
