@@ -1,3 +1,11 @@
+/**
+ ** Contents
+ ** --------
+ ** 0. Imports
+ ** 1. Internal Thunk Factory
+ ** 2. Action Creators Factory
+ **/
+
 import * as _ from "ramda";
 import {
   dispatchAnUnexpectedErrorEvent,
