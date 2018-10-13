@@ -44,9 +44,17 @@ describe("CRUD Rest Api", () => {
       });
 
       describe("[RETURNS]", () => {
-        it("[RETURNS] The factory function must return a function", () => {
+        it("[CORRECT TYPE] The factory function must return a function", () => {
           const { mockActionTypes } = createMocks();
           assert.equal(typeof reducerFactory(mockActionTypes), "function");
+        });
+
+        it("[CORRECT TYPE] The returned function must have an 'extend' method", () => {
+          const { mockActionTypes } = createMocks();
+          assert.equal(
+            typeof reducerFactory(mockActionTypes).extend,
+            "function"
+          );
         });
       });
     });
@@ -75,6 +83,8 @@ describe("CRUD Rest Api", () => {
         });
       });
     });
+
+    describe("reducer", () => {});
   });
 
   describe("[OPERATION]", () => {});
