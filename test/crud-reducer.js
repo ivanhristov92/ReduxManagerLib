@@ -1,6 +1,8 @@
 var assert = require("assert");
 import reducerFactory from "../crud-reducer";
 
+import createMocks from "./create-mocks";
+
 describe("CRUD Rest Api", () => {
   describe("[EXPORTS]", function() {
     it("The module must expose a factory function", () => {
@@ -10,8 +12,13 @@ describe("CRUD Rest Api", () => {
 
   describe("[MODULE INITIALIZATION SIGNATURE]", () => {
     describe("reducerFactory", () => {
-      describe("[EXPECTS] 'actionTypes' as 0th argument", () => {
-        it("[ACCEPTS]", () => {});
+      describe("[EXPECTS] 'actionTypes: ActionTypes' as 0th argument", () => {
+        it("[ACCEPTS] an object", () => {
+          const { mockActionTypes } = createMocks();
+          assert.doesNotThrow(function() {
+            reducerFactory(mockActionTypes);
+          }, Error);
+        });
         it("[THROWS]", () => {});
       });
 

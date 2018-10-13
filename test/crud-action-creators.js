@@ -10,48 +10,10 @@ var assert = require("assert");
 var sinon = require("sinon");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
+import createMocks from "./create-mocks";
 
 import * as _ from "ramda";
 import { ModuleInitializationTypeError } from "../crud-error-types";
-
-function createMocks(restApiRejects = false) {
-  return {
-    mockActionTypes: {
-      CREATE: "CREATE",
-      CREATE__SUCCESS: "CREATE__SUCCESS",
-      CREATE__FAILURE: "CREATE__FAILURE",
-      READ: "READ",
-      READ__SUCCESS: "READ__SUCCESS",
-      READ__FAILURE: "READ__FAILURE",
-      UPDATE: "UPDATE",
-      UPDATE__SUCCESS: "UPDATE__SUCCESS",
-      UPDATE__FAILURE: "UPDATE__FAILURE",
-      DELETE: "DELETE",
-      DELETE__SUCCESS: "DELETE__SUCCESS",
-      DELETE__FAILURE: "DELETE__FAILURE"
-    },
-    mockRestApi: {
-      create() {
-        return testPromise();
-      },
-      read() {
-        return testPromise();
-      },
-      update() {
-        return testPromise();
-      },
-      delete() {
-        return testPromise();
-      }
-    }
-  };
-
-  function testPromise() {
-    return new Promise((resolve, reject) => {
-      restApiRejects ? reject({ test: false }) : resolve({ test: true });
-    });
-  }
-}
 
 describe("CRUD Action Creators", () => {
   describe("[EXPORTS] The module must expose a factory function, that creates the action creators for a model", function() {
@@ -79,7 +41,7 @@ describe("CRUD Action Creators", () => {
           }
         });
 
-        it("[ACCEPTS][CORRECT TYPE] accepts an ActionTypes object for 'actionTypes'", () => {
+        it("[ACCEPTS] accepts an ActionTypes object for 'actionTypes'", () => {
           assert.doesNotThrow(function() {
             actionCreatorsFactory(mockActionTypes, mockRestApi);
           });
