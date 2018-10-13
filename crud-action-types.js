@@ -1,5 +1,6 @@
 import * as _ from "ramda";
 import { ModuleInitializationTypeError } from "./crud-error-types";
+import { addExtendFunctionality } from "./utils";
 
 export default function actionTypesFactory(modelName) {
   if (typeof modelName !== "string" || modelName === "") {
@@ -26,33 +27,6 @@ export default function actionTypesFactory(modelName) {
     DELETE__SUCCESS: "DELETE__SUCCESS",
     DELETE__FAILURE: "DELETE__FAILURE"
   });
-  function createExtendableActionTypes() {
-    const extendFunctionalityProto = {
-      extend: function extendActionTypes(additionalActionTypes) {
-        if (!additionalActionTypes) {
-          throw new TypeError(
-            "Expected and object, but received " + typeof additionalActionTypes
-          );
-        }
 
-        if (typeof additionalActionTypes !== "object") {
-          throw new TypeError(
-            "Expected and object, but received " + typeof additionalActionTypes
-          );
-        }
-
-        if (Array.isArray(additionalActionTypes)) {
-          throw new TypeError(
-            "Expected and object, but received " + typeof additionalActionTypes
-          );
-        }
-        let extendableActionTypes = createExtendableActionTypes();
-        return Object.assign(extendableActionTypes, additionalActionTypes);
-      }
-    };
-
-    return Object.assign(Object.create(extendFunctionalityProto), actionTypes);
-  }
-
-  return createExtendableActionTypes();
+  return addExtendFunctionality(actionTypes);
 }
