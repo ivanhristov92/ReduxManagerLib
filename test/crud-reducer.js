@@ -70,8 +70,6 @@ describe("CRUD Rest Api", () => {
           const reducer = reducerFactory(mockActionTypes);
           const initialState = reducer(undefined);
           const createAction = { type: mockActionTypes.CREATE, payload: {} };
-          mockActionTypes["CREATE"] = `NOT_CREATE`;
-
           const stateAfterAction = reducer(initialState, createAction);
           assert.notDeepEqual(initialState, stateAfterAction);
         });
