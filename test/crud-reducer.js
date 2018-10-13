@@ -61,33 +61,74 @@ describe("CRUD Rest Api", () => {
   });
 
   describe("[RUNTIME SIGNATURE]", () => {
-    describe("reducerFactory", () => {
-      describe("[HANDLES] does not allow 'actionTypes' to be changed from outside", () => {
-        it("the incorrect action type does not affect the state", () => {
-          const { mockActionTypes } = createMocks();
-          const reducer = reducerFactory(mockActionTypes);
-          const initialState = reducer(undefined);
-          const createAction = { type: mockActionTypes.CREATE, payload: {} };
-          mockActionTypes["CREATE"] = `NOT_CREATE`;
-          const stateAfterAction = reducer(initialState, createAction);
-          assert.deepEqual(initialState, stateAfterAction);
-        });
+    describe("reducer", () => {
+      describe("[EXPECTS]", () => {
+        describe("'state' as 0th argument", () => {
+          it("[ACCEPTS] undefined", () => {
+            const { mockActionTypes } = createMocks();
+            const reducer = reducerFactory(mockActionTypes);
+            assert.doesNotThrow(function() {
+              reducer(undefined);
+            }, Error);
+          });
+          it("[ACCEPTS] an object", () => {
+            const { mockActionTypes } = createMocks();
+            const reducer = reducerFactory(mockActionTypes);
+            assert.doesNotThrow(function() {
+              reducer(undefined);
+            }, Error);
+          });
 
-        it("the correct action type affects the state", () => {
-          const { mockActionTypes } = createMocks();
-          const reducer = reducerFactory(mockActionTypes);
-          const initialState = reducer(undefined);
-          const createAction = { type: mockActionTypes.CREATE, payload: {} };
-          const stateAfterAction = reducer(initialState, createAction);
-          assert.notDeepEqual(initialState, stateAfterAction);
+          [
+            null,
+            2,
+            false,
+            true,
+            Error,
+            function() {},
+            [],
+            "",
+            "string"
+          ].forEach(data => {
+            it(`[THROWS] if 'state' is of type ${typeof data}: ${data}`, () => {
+              const { mockActionTypes } = createMocks();
+              const reducer = reducerFactory(mockActionTypes);
+              assert.throws(function() {
+                reducer(data);
+              }, Error);
+            });
+          });
         });
       });
+
+      describe("[RETURNS]", () => {});
     });
 
     describe("reducer", () => {});
   });
 
-  describe("[OPERATION]", () => {});
+  describe("[OPERATION]", () => {
+    describe("[HANDLES] does not allow 'actionTypes' to be changed from outside", () => {
+      it("the incorrect action type does not affect the state", () => {
+        const { mockActionTypes } = createMocks();
+        const reducer = reducerFactory(mockActionTypes);
+        const initialState = reducer(undefined);
+        const createAction = { type: mockActionTypes.CREATE, payload: {} };
+        mockActionTypes["CREATE"] = `NOT_CREATE`;
+        const stateAfterAction = reducer(initialState, createAction);
+        assert.deepEqual(initialState, stateAfterAction);
+      });
+
+      it("the correct action type affects the state", () => {
+        const { mockActionTypes } = createMocks();
+        const reducer = reducerFactory(mockActionTypes);
+        const initialState = reducer(undefined);
+        const createAction = { type: mockActionTypes.CREATE, payload: {} };
+        const stateAfterAction = reducer(initialState, createAction);
+        assert.notDeepEqual(initialState, stateAfterAction);
+      });
+    });
+  });
 
   describe("The reducer must handle actions correctly", function() {
     it("The reducer should expect a valid action", () => {
