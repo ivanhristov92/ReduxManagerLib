@@ -22,7 +22,9 @@ export default function reducerFactory(actionTypes) {
       }
 
       switch (action.type) {
-        case a["CREATE"]:
+        case (function() {
+          return a["CREATE"];
+        })():
         case a["READ"]:
         case a["UPDATE"]:
         case a["DELETE"]:

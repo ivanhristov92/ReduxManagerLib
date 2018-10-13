@@ -1,4 +1,10 @@
+import actionCreatorsFactory from "../crud-action-creators";
+
 var assert = require("assert");
+var sinon = require("sinon");
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+
 import reducerFactory from "../crud-reducer";
 
 import createMocks from "./create-mocks";
@@ -37,13 +43,41 @@ describe("CRUD Rest Api", () => {
         );
       });
 
-      it("[RETURNS] The factory function must return a function", () => {
-        assert.equal(typeof reducerFactory(), "function");
+      describe("[RETURNS]", () => {
+        it("[RETURNS] The factory function must return a function", () => {
+          const { mockActionTypes } = createMocks();
+          assert.equal(typeof reducerFactory(mockActionTypes), "function");
+        });
       });
     });
   });
 
-  describe("[RUNTIME SIGNATURE]", () => {});
+  describe("[RUNTIME SIGNATURE]", () => {
+    describe("reducerFactory", () => {
+      describe("[HANDLES] does not allow 'actionTypes' to be changed from outside", () => {
+        it("the incorrect action type does not affect the state", () => {
+          const { mockActionTypes } = createMocks();
+          const reducer = reducerFactory(mockActionTypes);
+          const initialState = reducer(undefined);
+          const createAction = { type: mockActionTypes.CREATE, payload: {} };
+          mockActionTypes["CREATE"] = `NOT_CREATE`;
+          const stateAfterAction = reducer(initialState, createAction);
+          assert.deepEqual(initialState, stateAfterAction);
+        });
+
+        it("the correct action type affects the state", () => {
+          const { mockActionTypes } = createMocks();
+          const reducer = reducerFactory(mockActionTypes);
+          const initialState = reducer(undefined);
+          const createAction = { type: mockActionTypes.CREATE, payload: {} };
+          mockActionTypes["CREATE"] = `NOT_CREATE`;
+
+          const stateAfterAction = reducer(initialState, createAction);
+          assert.notDeepEqual(initialState, stateAfterAction);
+        });
+      });
+    });
+  });
 
   describe("[OPERATION]", () => {});
 
