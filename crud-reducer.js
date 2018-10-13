@@ -1,4 +1,8 @@
 import * as _ from "ramda";
+import {
+  ModuleInitializationTypeError,
+  dispatchAnUnexpectedErrorEvent
+} from "./crud-error-types";
 
 export default function reducerFactory(actionTypes) {
   const a = actionTypes;
@@ -11,6 +15,20 @@ export default function reducerFactory(actionTypes) {
         throw new TypeError(`"${crudAct}" is not found in actionTypes`);
       }
     });
+
+  let runtimeErrorHandler = function defaultRuntimeErrorHandler(error, state) {
+    try {
+      dispatchAnUnexpectedErrorEvent(error);
+
+      return {
+        ...state,
+        error: error
+      };
+    } catch (err) {
+      //emit global error
+      dispatchAnUnexpectedErrorEvent(err);
+    }
+  };
 
   function reducer(
     state = { byId: {}, isFetching: false, error: null },
@@ -74,18 +92,21 @@ export default function reducerFactory(actionTypes) {
       }
     } catch (error) {
       // unexpeted run-time error
-      try {
-        return {
-          ...state,
-          error: error
-        };
-      } catch (err) {
-        //emit global error
-      }
+      return runtimeErrorHandler(error, state);
     }
   }
 
   reducer.extend = function() {};
+
+  reducer.setRuntimeErrorHandler = function(customErrorHandler) {
+    if (typeof customErrorHandler !== "function") {
+      throw new ModuleInitializationTypeError(
+        "setRuntimeErrorHandler expects a function, instead it received " +
+          typeof customErrorHandler
+      );
+    }
+    runtimeErrorHandler = customErrorHandler;
+  };
 
   return reducer;
 }
