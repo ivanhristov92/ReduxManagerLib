@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --require babel-polyfill --require babel-register ./test/**/crud-action-types.js"
+    "test": "mocha --require babel-polyfill --require babel-register ./test/**/crud-reducer.js"
   },
   "author": "",
   "license": "ISC",

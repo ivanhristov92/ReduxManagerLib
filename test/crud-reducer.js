@@ -2,14 +2,28 @@ var assert = require("assert");
 import reducerFactory from "../crud-reducer";
 
 describe("CRUD Rest Api", () => {
-  describe("The module must expose a factory function, that creates the reducer for a model", function() {
-    it("The module should default export a function", () => {
+  describe("[EXPORTS]", function() {
+    it("The module must expose a factory function", () => {
       assert.equal(typeof reducerFactory, "function");
     });
-    it("The factory function must return a function", () => {
-      assert.equal(typeof reducerFactory(), "function");
+  });
+
+  describe("[MODULE INITIALIZATION SIGNATURE]", () => {
+    describe("reducerFactory", () => {
+      describe("[EXPECTS] 'actionTypes' as 0th argument", () => {
+        it("[ACCEPTS]", () => {});
+        it("[THROWS]", () => {});
+      });
+
+      it("[RETURNS] The factory function must return a function", () => {
+        assert.equal(typeof reducerFactory(), "function");
+      });
     });
   });
+
+  describe("[RUNTIME SIGNATURE]", () => {});
+
+  describe("[OPERATION]", () => {});
 
   describe("The reducer must handle actions correctly", function() {
     it("The reducer should expect a valid action", () => {
