@@ -13,13 +13,28 @@ describe("CRUD Rest Api", () => {
   describe("[MODULE INITIALIZATION SIGNATURE]", () => {
     describe("reducerFactory", () => {
       describe("[EXPECTS] 'actionTypes: ActionTypes' as 0th argument", () => {
-        it("[ACCEPTS] an object", () => {
+        it("[ACCEPTS] an object of type ActionTypes", () => {
           const { mockActionTypes } = createMocks();
           assert.doesNotThrow(function() {
             reducerFactory(mockActionTypes);
           }, Error);
         });
-        it("[THROWS]", () => {});
+
+        [1, undefined, " ", true, null, [], Error, function() {}, {}].forEach(
+          data => {
+            it(
+              "[THROWS] throws if it is provided a " +
+                typeof data +
+                ": " +
+                data,
+              () => {
+                assert.throws(function() {
+                  reducerFactory(data);
+                });
+              }
+            );
+          }
+        );
       });
 
       it("[RETURNS] The factory function must return a function", () => {
