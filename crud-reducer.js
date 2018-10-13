@@ -16,7 +16,11 @@ export default function reducerFactory(actionTypes) {
       }
     });
 
-  let runtimeErrorHandler = function defaultRuntimeErrorHandler(error, state) {
+  let runtimeErrorHandler = function defaultRuntimeErrorHandler(
+    error,
+    state,
+    action
+  ) {
     try {
       dispatchAnUnexpectedErrorEvent(error);
 
@@ -92,7 +96,7 @@ export default function reducerFactory(actionTypes) {
       }
     } catch (error) {
       // unexpeted run-time error
-      return runtimeErrorHandler(error, state);
+      return runtimeErrorHandler(error, state, action);
     }
   }
 
