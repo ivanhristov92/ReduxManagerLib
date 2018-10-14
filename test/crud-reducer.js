@@ -234,19 +234,25 @@ describe("CRUD Rest Api", () => {
             ["CREATE", "READ", "UPDATE", "DELETE"].forEach(crudAct => {
               describe(crudAct, () => {
                 it(`The reducer should turn ON the isFetching flag on "${crudAct}"`, () => {
-                  const action = { type: crudAct };
+                  const action = { type: mockActionTypes[crudAct] };
                   let state = reducer(undefined, action);
                   assert.equal(state.isFetching, true);
                 });
 
                 it(`The reducer should turn OFF the isFetching flag on "${crudAct}__FAILURE"`, () => {
-                  const action = { type: `${crudAct}__FAILURE`, error: {} };
+                  const action = {
+                    type: mockActionTypes[`${crudAct}__FAILURE`],
+                    error: {}
+                  };
                   let state = reducer({ byId: {}, isFetching: true }, action);
                   assert.equal(state.isFetching, false);
                 });
 
                 it(`The reducer should turn OFF the isFetching flag on "${crudAct}__SUCCESS"`, () => {
-                  const action = { type: `${crudAct}__SUCCESS`, payload: {} };
+                  const action = {
+                    type: mockActionTypes[`${crudAct}__SUCCESS`],
+                    payload: {}
+                  };
                   let state = reducer({ byId: {}, isFetching: true }, action);
                   assert.equal(state.isFetching, false);
                 });
@@ -254,7 +260,10 @@ describe("CRUD Rest Api", () => {
                 if (crudAct === "DELETE") {
                   it(`The reducer should update the state 'byId' section on "DELETE__SUCCESS"`, () => {
                     let crudAct = "DELETE__SUCCESS";
-                    const action = { type: crudAct, payload: { id: "b" } };
+                    const action = {
+                      type: mockActionTypes[crudAct],
+                      payload: { id: "b" }
+                    };
                     let state = reducer(
                       { byId: { a: 1, b: 2 }, isFetching: true },
                       action
@@ -264,7 +273,7 @@ describe("CRUD Rest Api", () => {
                 } else {
                   it(`The reducer should update the state 'byId' section on "${crudAct}__SUCCESS"`, () => {
                     const action = {
-                      type: `${crudAct}__SUCCESS`,
+                      type: mockActionTypes[`${crudAct}__SUCCESS`],
                       payload: { byId: { c: 3 } }
                     };
                     let state = reducer(

@@ -1,18 +1,18 @@
 export default function createMocks(restApiRejects = false) {
   return {
     mockActionTypes: {
-      CREATE: "CREATE",
-      CREATE__SUCCESS: "CREATE__SUCCESS",
-      CREATE__FAILURE: "CREATE__FAILURE",
-      READ: "READ",
-      READ__SUCCESS: "READ__SUCCESS",
-      READ__FAILURE: "READ__FAILURE",
-      UPDATE: "UPDATE",
-      UPDATE__SUCCESS: "UPDATE__SUCCESS",
-      UPDATE__FAILURE: "UPDATE__FAILURE",
-      DELETE: "DELETE",
-      DELETE__SUCCESS: "DELETE__SUCCESS",
-      DELETE__FAILURE: "DELETE__FAILURE"
+      CREATE: "SomeModel/CREATE",
+      CREATE__SUCCESS: "SomeModel/CREATE__SUCCESS",
+      CREATE__FAILURE: "SomeModel/CREATE__FAILURE",
+      READ: "SomeModel/READ",
+      READ__SUCCESS: "SomeModel/READ__SUCCESS",
+      READ__FAILURE: "SomeModel/READ__FAILURE",
+      UPDATE: "SomeModel/UPDATE",
+      UPDATE__SUCCESS: "SomeModel/UPDATE__SUCCESS",
+      UPDATE__FAILURE: "SomeModel/UPDATE__FAILURE",
+      DELETE: "SomeModel/DELETE",
+      DELETE__SUCCESS: "SomeModel/DELETE__SUCCESS",
+      DELETE__FAILURE: "SomeModel/DELETE__FAILURE"
     },
     mockRestApi: {
       create() {
