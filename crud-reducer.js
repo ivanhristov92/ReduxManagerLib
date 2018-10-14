@@ -127,11 +127,10 @@ function typeCheckActionTypes(actionTypes) {
     });
 }
 
-function typeCheckOptions(options = {}) {
+function typeCheckOptions(options) {
   if (
-    (typeof options !== "undefined" && typeof options !== "object") ||
-    Array.isArray(options) ||
-    !options
+    typeof options !== "undefined" &&
+    (typeof options !== "object" || Array.isArray(options) || !options)
   ) {
     throw new ModuleInitializationTypeError(
       "'options' must be an object or undefined. Instead received: " +
