@@ -283,25 +283,82 @@ describe("CRUD Rest Api", () => {
   });
 
   describe("[OPERATION]", () => {
-    describe("[HANDLES] does not allow 'actionTypes' to be changed from outside", () => {
-      it("the incorrect action type does not affect the state", () => {
-        const { mockActionTypes } = createMocks();
+    describe("reducer", () => {
+      describe("[HANDLES] does not allow 'actionTypes' to be changed from outside", () => {
+        it("the incorrect action type does not affect the state", () => {
+          const { mockActionTypes } = createMocks();
 
-        const reducer = reducerFactory(mockActionTypes);
-        const initialState = reducer(undefined, { type: "test" });
-        const createAction = { type: mockActionTypes.CREATE, payload: {} };
-        mockActionTypes["CREATE"] = `NOT_CREATE`;
-        const stateAfterAction = reducer(initialState, createAction);
-        assert.deepEqual(initialState, stateAfterAction);
+          const reducer = reducerFactory(mockActionTypes);
+          const initialState = reducer(undefined, { type: "test" });
+          const createAction = { type: mockActionTypes.CREATE, payload: {} };
+          mockActionTypes["CREATE"] = `NOT_CREATE`;
+          const stateAfterAction = reducer(initialState, createAction);
+          assert.deepEqual(initialState, stateAfterAction);
+        });
+
+        it("the correct action type affects the state", () => {
+          const { mockActionTypes } = createMocks();
+          const reducer = reducerFactory(mockActionTypes);
+          const initialState = reducer(undefined, { type: "test" });
+          const createAction = { type: mockActionTypes.CREATE, payload: {} };
+          const stateAfterAction = reducer(initialState, createAction);
+          assert.notDeepEqual(initialState, stateAfterAction);
+        });
       });
 
-      it("the correct action type affects the state", () => {
-        const { mockActionTypes } = createMocks();
-        const reducer = reducerFactory(mockActionTypes);
-        const initialState = reducer(undefined, { type: "test" });
-        const createAction = { type: mockActionTypes.CREATE, payload: {} };
-        const stateAfterAction = reducer(initialState, createAction);
-        assert.notDeepEqual(initialState, stateAfterAction);
+      describe("[CALLS] customErrorHandler", () => {
+        describe("calls the 'customErrorHandlerFunction' with the proper arguments", () => {
+          let mockActionTypes;
+          let customErrorHandler = { customErrorHandler() {} };
+          let reducer;
+          beforeEach(() => {
+            mockActionTypes = createMocks().mockActionTypes;
+            customErrorHandler = { customErrorHandler() {} };
+            sinon.spy(customErrorHandler, "customErrorHandler");
+            reducer = reducerFactory(
+              mockActionTypes,
+              customErrorHandler.customErrorHandler
+            );
+          });
+
+          it("passes 3 arguments", () => {
+            reducer(undefined, null);
+            const errorHandlerCall = customErrorHandler.customErrorHandler.getCall(
+              0
+            );
+            const args = errorHandlerCall.args;
+            assert.equal(args.length, 3);
+          });
+
+          it("1st argument is the error", () => {
+            reducer(undefined, null);
+            const errorHandlerCall = customErrorHandler.customErrorHandler.getCall(
+              0
+            );
+            const firstArg = errorHandlerCall.args[0];
+            assert.equal(firstArg instanceof Error, true);
+          });
+
+          it("2nd argument is the state", () => {
+            let state = { testState: true };
+            reducer(state, null);
+            const errorHandlerCall = customErrorHandler.customErrorHandler.getCall(
+              0
+            );
+            const secondArg = errorHandlerCall.args[1];
+            assert.deepEqual(secondArg, state);
+          });
+
+          it("3rd argument is the action", () => {
+            let badAction = { testState: true };
+            reducer(undefined, badAction);
+            const errorHandlerCall = customErrorHandler.customErrorHandler.getCall(
+              0
+            );
+            const thirdArg = errorHandlerCall.args[2];
+            assert.deepEqual(thirdArg, badAction);
+          });
+        });
       });
     });
   });
