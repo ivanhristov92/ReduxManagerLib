@@ -4,6 +4,10 @@ import {
   dispatchAnUnexpectedErrorEvent
 } from "./crud-error-types";
 
+/////////////////////////////////////////////////////////////////////
+////// COMMON INTERNAL REDUCERS /////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+
 function createReadUpdateDelete(state, action) {
   return {
     ...state,
@@ -44,25 +48,13 @@ function successfulDelete(state, action) {
   };
 }
 
-function typeCheckState(state) {
-  if (
-    (typeof state !== "undefined" && typeof state !== "object") ||
-    Array.isArray(state) ||
-    !state
-  ) {
-    throw new TypeError(
-      "'state' must be an object or undefined. Instead received: " + state
-    );
-  }
-}
+/////////////////////////////////////////////////////////////////////
+////// TYPE CHECKERS ////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
 
-function typeCheckAction(action) {
-  if (typeof action !== "object" || !action.type) {
-    throw new TypeError("'not a valid action'");
-  }
-}
+// [MODULE INITIALIZATION]
 
-export default function reducerFactory(actionTypes, customErrorHandler) {
+function typeCheckActionTypes(actionTypes) {
   if (!actionTypes || typeof actionTypes !== "object") {
     throw new ModuleInitializationTypeError(
       `'actionTypes' must be a valid ActionTypes object`
@@ -81,7 +73,9 @@ export default function reducerFactory(actionTypes, customErrorHandler) {
         );
       }
     });
+}
 
+function typeCheckCustomErrorHandler(customErrorHandler) {
   if (
     typeof customErrorHandler !== "undefined" &&
     typeof customErrorHandler !== "function"
@@ -91,22 +85,51 @@ export default function reducerFactory(actionTypes, customErrorHandler) {
         typeof customErrorHandler
     );
   }
+}
 
-  let runtimeErrorHandler =
-    customErrorHandler ||
-    function defaultRuntimeErrorHandler(error, state, action) {
-      try {
-        dispatchAnUnexpectedErrorEvent(error);
+// [RUNTIME]
+function typeCheckState(state) {
+  if (
+    (typeof state !== "undefined" && typeof state !== "object") ||
+    Array.isArray(state) ||
+    !state
+  ) {
+    throw new TypeError(
+      "'state' must be an object or undefined. Instead received: " + state
+    );
+  }
+}
 
-        return {
-          ...state,
-          error: error
-        };
-      } catch (err) {
-        //emit global error
-        dispatchAnUnexpectedErrorEvent(err);
-      }
+function typeCheckAction(action) {
+  if (typeof action !== "object" || !action.type) {
+    throw new TypeError("'not a valid action'");
+  }
+}
+
+/////////////////////////////////////////////////////////////////////
+////// REDUCER FACTORY //////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+
+function defaultRuntimeErrorHandler(error, state, action) {
+  try {
+    dispatchAnUnexpectedErrorEvent(error);
+
+    return {
+      ...state,
+      error: error
     };
+  } catch (err) {
+    //emit global error
+    dispatchAnUnexpectedErrorEvent(err);
+  }
+}
+
+export default function reducerFactory(actionTypes, customErrorHandler) {
+  typeCheckActionTypes(actionTypes);
+  typeCheckCustomErrorHandler(customErrorHandler);
+  let a = actionTypes;
+
+  let runtimeErrorHandler = customErrorHandler || defaultRuntimeErrorHandler;
 
   let does = {
     [a["CREATE"]]: createReadUpdateDelete,
