@@ -8,13 +8,17 @@ import {
 ////// REDUCER FACTORY //////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
-export default function reducerFactory(actionTypes, customErrorHandler) {
+export default function reducerFactory(
+  actionTypes,
+  { customErrorHandler, additionalActions }
+) {
   typeCheckActionTypes(actionTypes);
+  typeCheckAdditionalActions(additionalActions);
   typeCheckCustomErrorHandler(customErrorHandler);
 
   let runtimeErrorHandler = customErrorHandler || defaultRuntimeErrorHandler;
 
-  let does = {
+  let does = Object.assign({
     [actionTypes["CREATE"]]: createReadUpdateDelete,
     [actionTypes["READ"]]: createReadUpdateDelete,
     [actionTypes["UPDATE"]]: createReadUpdateDelete,
@@ -29,7 +33,8 @@ export default function reducerFactory(actionTypes, customErrorHandler) {
     [actionTypes["READ__FAILURE"]]: failedCreateReadUpdateDelete,
     [actionTypes["UPDATE__FAILURE"]]: failedCreateReadUpdateDelete,
     [actionTypes["DELETE__FAILURE"]]: failedCreateReadUpdateDelete
-  };
+  }, (additionalActions || {});
+
 
   function reducer(
     state = { byId: {}, isFetching: false, error: null },
@@ -135,6 +140,8 @@ function typeCheckCustomErrorHandler(customErrorHandler) {
     );
   }
 }
+
+function typeCheckAdditionalActions(additionalActions) {}
 
 // [RUNTIME]
 function typeCheckState(state) {
