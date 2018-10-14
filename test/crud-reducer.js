@@ -282,32 +282,27 @@ describe("CRUD Rest Api", () => {
     });
   });
 
-  // describe("[OPERATION]", () => {
-  //   describe("[HANDLES] does not allow 'actionTypes' to be changed from outside", () => {
-  //     it("the incorrect action type does not affect the state", () => {
-  //       const { mockActionTypes } = createMocks();
-  //       const reducer = reducerFactory(
-  //         mockActionTypes,
-  //         function emptyErrorHandler() {}
-  //       );
-  //       const initialState = reducer(undefined);
-  //       const createAction = { type: mockActionTypes.CREATE, payload: {} };
-  //       mockActionTypes["CREATE"] = `NOT_CREATE`;
-  //       const stateAfterAction = reducer(initialState, createAction);
-  //       assert.deepEqual(initialState, stateAfterAction);
-  //     });
-  //
-  //     it("the correct action type affects the state", () => {
-  //       const { mockActionTypes } = createMocks();
-  //       const reducer = reducerFactory(
-  //         mockActionTypes,
-  //         function emptyErrorHandler() {}
-  //       );
-  //       const initialState = reducer(undefined);
-  //       const createAction = { type: mockActionTypes.CREATE, payload: {} };
-  //       const stateAfterAction = reducer(initialState, createAction);
-  //       assert.notDeepEqual(initialState, stateAfterAction);
-  //     });
-  //   });
-  // });
+  describe("[OPERATION]", () => {
+    describe("[HANDLES] does not allow 'actionTypes' to be changed from outside", () => {
+      it("the incorrect action type does not affect the state", () => {
+        const { mockActionTypes } = createMocks();
+
+        const reducer = reducerFactory(mockActionTypes);
+        const initialState = reducer(undefined, { type: "test" });
+        const createAction = { type: mockActionTypes.CREATE, payload: {} };
+        mockActionTypes["CREATE"] = `NOT_CREATE`;
+        const stateAfterAction = reducer(initialState, createAction);
+        assert.deepEqual(initialState, stateAfterAction);
+      });
+
+      it("the correct action type affects the state", () => {
+        const { mockActionTypes } = createMocks();
+        const reducer = reducerFactory(mockActionTypes);
+        const initialState = reducer(undefined, { type: "test" });
+        const createAction = { type: mockActionTypes.CREATE, payload: {} };
+        const stateAfterAction = reducer(initialState, createAction);
+        assert.notDeepEqual(initialState, stateAfterAction);
+      });
+    });
+  });
 });
