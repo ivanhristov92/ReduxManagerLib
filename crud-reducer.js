@@ -5,6 +5,12 @@ import {
 } from "./crud-error-types";
 
 export default function reducerFactory(actionTypes, customErrorHandler) {
+  if (!actionTypes || typeof actionTypes !== "object") {
+    throw new ModuleInitializationTypeError(
+      `'actionTypes' must be a valid ActionTypes object`
+    );
+  }
+
   const a = actionTypes;
   ["CREATE", "READ", "UPDATE", "DELETE"]
     .reduce((acc, crudAct) => {
@@ -12,7 +18,9 @@ export default function reducerFactory(actionTypes, customErrorHandler) {
     }, [])
     .forEach(crudAct => {
       if (!actionTypes[crudAct]) {
-        throw new TypeError(`"${crudAct}" is not found in actionTypes`);
+        throw new ModuleInitializationTypeError(
+          `"${crudAct}" is not found in actionTypes`
+        );
       }
     });
 

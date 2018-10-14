@@ -2,8 +2,6 @@ import actionCreatorsFactory from "../crud-action-creators";
 
 var assert = require("assert");
 var sinon = require("sinon");
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
 
 import reducerFactory from "../crud-reducer";
 
@@ -29,18 +27,55 @@ describe("CRUD Rest Api", () => {
         [1, undefined, " ", true, null, [], Error, function() {}, {}].forEach(
           data => {
             it(
-              "[THROWS] throws if it is provided a " +
+              "[THROWS] throws a 'ModuleInitializationTypeError' if it is provided a " +
                 typeof data +
                 ": " +
                 data,
               () => {
-                assert.throws(function() {
+                try {
                   reducerFactory(data);
-                });
+                  throw new Error("Should have thrown");
+                } catch (err) {
+                  assert.equal(err.name, "ModuleInitializationTypeError");
+                }
               }
             );
           }
         );
+      });
+
+      describe("[EXPECTS] a 'customErrorHandler' function as the 1st argument", () => {
+        it("[ACCEPTS] undefined", () => {
+          const { mockActionTypes } = createMocks();
+          assert.doesNotThrow(function() {
+            reducerFactory(mockActionTypes, undefined);
+          }, Error);
+        });
+
+        it("[ACCEPTS] a function", () => {
+          const { mockActionTypes } = createMocks();
+          assert.doesNotThrow(function() {
+            reducerFactory(mockActionTypes, function() {});
+          }, Error);
+        });
+
+        [1, " ", true, null, [], {}].forEach(data => {
+          it(
+            "[THROWS] throws a 'ModuleInitializationTypeError' if it is provided a " +
+              typeof data +
+              ": " +
+              data,
+            () => {
+              const { mockActionTypes } = createMocks();
+              try {
+                reducerFactory(mockActionTypes, data);
+                throw new Error("Should have thrown");
+              } catch (err) {
+                assert.equal(err.name, "ModuleInitializationTypeError");
+              }
+            }
+          );
+        });
       });
 
       describe("[RETURNS]", () => {
