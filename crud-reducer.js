@@ -4,7 +4,7 @@ import {
   dispatchAnUnexpectedErrorEvent
 } from "./crud-error-types";
 
-export default function reducerFactory(actionTypes) {
+export default function reducerFactory(actionTypes, customErrorHandler) {
   const a = actionTypes;
   ["CREATE", "READ", "UPDATE", "DELETE"]
     .reduce((acc, crudAct) => {
@@ -16,29 +16,47 @@ export default function reducerFactory(actionTypes) {
       }
     });
 
-  let runtimeErrorHandler = function defaultRuntimeErrorHandler(
-    error,
-    state,
-    action
+  if (
+    typeof customErrorHandler !== "undefined" &&
+    typeof customErrorHandler !== "function"
   ) {
-    try {
-      dispatchAnUnexpectedErrorEvent(error);
+    throw new ModuleInitializationTypeError(
+      "setRuntimeErrorHandler expects a function, instead it received " +
+        typeof customErrorHandler
+    );
+  }
 
-      return {
-        ...state,
-        error: error
-      };
-    } catch (err) {
-      //emit global error
-      dispatchAnUnexpectedErrorEvent(err);
-    }
-  };
+  let runtimeErrorHandler =
+    customErrorHandler ||
+    function defaultRuntimeErrorHandler(error, state, action) {
+      try {
+        dispatchAnUnexpectedErrorEvent(error);
+
+        return {
+          ...state,
+          error: error
+        };
+      } catch (err) {
+        //emit global error
+        dispatchAnUnexpectedErrorEvent(err);
+      }
+    };
 
   function reducer(
     state = { byId: {}, isFetching: false, error: null },
     action
   ) {
     try {
+      if (
+        (typeof state !== "undefined" && typeof state !== "object") ||
+        Array.isArray(state) ||
+        !state
+      ) {
+        throw new TypeError(
+          "'state' must be an object or undefined. Instead received: " + state
+        );
+      }
+
       if (!action.type) {
         throw new TypeError("'not a valid action'");
       }
@@ -95,22 +113,11 @@ export default function reducerFactory(actionTypes) {
           return state;
       }
     } catch (error) {
-      // unexpeted run-time error
+      // unexpected run-time error
       return runtimeErrorHandler(error, state, action);
     }
   }
 
   reducer.extend = function() {};
-
-  reducer.setRuntimeErrorHandler = function(customErrorHandler) {
-    if (typeof customErrorHandler !== "function") {
-      throw new ModuleInitializationTypeError(
-        "setRuntimeErrorHandler expects a function, instead it received " +
-          typeof customErrorHandler
-      );
-    }
-    runtimeErrorHandler = customErrorHandler;
-  };
-
   return reducer;
 }
