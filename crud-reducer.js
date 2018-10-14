@@ -8,33 +8,32 @@ import {
 ////// REDUCER FACTORY //////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
-export default function reducerFactory(
-  actionTypes,
-  { customErrorHandler, additionalActions }
-) {
+export default function reducerFactory(actionTypes, options) {
   typeCheckActionTypes(actionTypes);
-  typeCheckAdditionalActions(additionalActions);
-  typeCheckCustomErrorHandler(customErrorHandler);
+  typeCheckOptions(options);
 
-  let runtimeErrorHandler = customErrorHandler || defaultRuntimeErrorHandler;
+  let runtimeErrorHandler =
+    (options && options.customErrorHandler) || defaultRuntimeErrorHandler;
 
-  let does = Object.assign({
-    [actionTypes["CREATE"]]: createReadUpdateDelete,
-    [actionTypes["READ"]]: createReadUpdateDelete,
-    [actionTypes["UPDATE"]]: createReadUpdateDelete,
-    [actionTypes["DELETE"]]: createReadUpdateDelete,
+  let does = Object.assign(
+    {
+      [actionTypes["CREATE"]]: createReadUpdateDelete,
+      [actionTypes["READ"]]: createReadUpdateDelete,
+      [actionTypes["UPDATE"]]: createReadUpdateDelete,
+      [actionTypes["DELETE"]]: createReadUpdateDelete,
 
-    [actionTypes["CREATE__SUCCESS"]]: successfulCreateReadUpdate,
-    [actionTypes["READ__SUCCESS"]]: successfulCreateReadUpdate,
-    [actionTypes["UPDATE__SUCCESS"]]: successfulCreateReadUpdate,
-    [actionTypes["DELETE__SUCCESS"]]: successfulDelete,
+      [actionTypes["CREATE__SUCCESS"]]: successfulCreateReadUpdate,
+      [actionTypes["READ__SUCCESS"]]: successfulCreateReadUpdate,
+      [actionTypes["UPDATE__SUCCESS"]]: successfulCreateReadUpdate,
+      [actionTypes["DELETE__SUCCESS"]]: successfulDelete,
 
-    [actionTypes["CREATE__FAILURE"]]: failedCreateReadUpdateDelete,
-    [actionTypes["READ__FAILURE"]]: failedCreateReadUpdateDelete,
-    [actionTypes["UPDATE__FAILURE"]]: failedCreateReadUpdateDelete,
-    [actionTypes["DELETE__FAILURE"]]: failedCreateReadUpdateDelete
-  }, (additionalActions || {});
-
+      [actionTypes["CREATE__FAILURE"]]: failedCreateReadUpdateDelete,
+      [actionTypes["READ__FAILURE"]]: failedCreateReadUpdateDelete,
+      [actionTypes["UPDATE__FAILURE"]]: failedCreateReadUpdateDelete,
+      [actionTypes["DELETE__FAILURE"]]: failedCreateReadUpdateDelete
+    },
+    (options && options.additionalActions) || {}
+  );
 
   function reducer(
     state = { byId: {}, isFetching: false, error: null },
@@ -55,7 +54,6 @@ export default function reducerFactory(
     }
   }
 
-  reducer.extend = function() {};
   return reducer;
 }
 
@@ -153,6 +151,15 @@ function typeCheckState(state) {
     throw new TypeError(
       "'state' must be an object or undefined. Instead received: " + state
     );
+  }
+}
+
+function typeCheckOptions(options = {}) {
+  if (options.additionalActions) {
+    typeCheckAdditionalActions(options.additionalActions);
+  }
+  if (options.customErrorHandler) {
+    typeCheckCustomErrorHandler(options.customErrorHandler);
   }
 }
 
