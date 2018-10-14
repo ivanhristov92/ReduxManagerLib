@@ -222,71 +222,60 @@ describe("CRUD Rest Api", () => {
             });
           });
 
-          describe("unknown action type", () => {
-            it("The reducer should return state as is, if the action is unknown", () => {
-              const testState = { byId: { test: true } };
-              let state = reducer(testState, unknownAction);
-              assert.deepEqual(state, testState);
+          describe("action types", () => {
+            describe("unknown action type", () => {
+              it("The reducer should return state as is, if the action is unknown", () => {
+                const testState = { byId: { test: true } };
+                let state = reducer(testState, unknownAction);
+                assert.deepEqual(state, testState);
+              });
             });
-          });
 
-          describe("turns ON the 'isFetching' flag", () => {
             ["CREATE", "READ", "UPDATE", "DELETE"].forEach(crudAct => {
-              it(`The reducer should turn ON the isFetching flag on "${crudAct}"`, () => {
-                const action = { type: crudAct };
-                let state = reducer(undefined, action);
-                assert.equal(state.isFetching, true);
+              describe(crudAct, () => {
+                it(`The reducer should turn ON the isFetching flag on "${crudAct}"`, () => {
+                  const action = { type: crudAct };
+                  let state = reducer(undefined, action);
+                  assert.equal(state.isFetching, true);
+                });
+
+                it(`The reducer should turn OFF the isFetching flag on "${crudAct}__FAILURE"`, () => {
+                  const action = { type: `${crudAct}__FAILURE`, error: {} };
+                  let state = reducer({ byId: {}, isFetching: true }, action);
+                  assert.equal(state.isFetching, false);
+                });
+
+                it(`The reducer should turn OFF the isFetching flag on "${crudAct}__SUCCESS"`, () => {
+                  const action = { type: `${crudAct}__SUCCESS`, payload: {} };
+                  let state = reducer({ byId: {}, isFetching: true }, action);
+                  assert.equal(state.isFetching, false);
+                });
+
+                if (crudAct === "DELETE") {
+                  it(`The reducer should update the state 'byId' section on "DELETE__SUCCESS"`, () => {
+                    let crudAct = "DELETE__SUCCESS";
+                    const action = { type: crudAct, payload: { id: "b" } };
+                    let state = reducer(
+                      { byId: { a: 1, b: 2 }, isFetching: true },
+                      action
+                    );
+                    assert.deepEqual(state.byId, { a: 1 });
+                  });
+                } else {
+                  it(`The reducer should update the state 'byId' section on "${crudAct}__SUCCESS"`, () => {
+                    const action = {
+                      type: `${crudAct}__SUCCESS`,
+                      payload: { byId: { c: 3 } }
+                    };
+                    let state = reducer(
+                      { byId: { a: 1, b: 2 }, isFetching: true },
+                      action
+                    );
+                    assert.deepEqual(state.byId, { a: 1, b: 2, c: 3 });
+                  });
+                }
               });
             });
-          });
-
-          describe("turns OFF the 'isFetching' flag", () => {
-            ["CREATE", "READ", "UPDATE", "DELETE"].forEach(_crudAct => {
-              let crudAct = _crudAct + "__FAILURE";
-              it(`The reducer should turn OFF the isFetching flag on "${crudAct}"`, () => {
-                const action = { type: crudAct, error: {} };
-                let state = reducer({ byId: {}, isFetching: true }, action);
-                assert.equal(state.isFetching, false);
-              });
-            });
-
-            ["CREATE", "READ", "UPDATE"].forEach(_crudAct => {
-              let crudAct = _crudAct + "__SUCCESS";
-              it(`The reducer should turn OFF the isFetching flag on "${crudAct}"`, () => {
-                const action = { type: crudAct, payload: {} };
-                let state = reducer({ byId: {}, isFetching: true }, action);
-                assert.equal(state.isFetching, false);
-              });
-            });
-
-            it(`The reducer should turn OFF the isFetching flag on "DELETE__SUCCESS"`, () => {
-              let crudAct = "DELETE__SUCCESS";
-              const action = { type: crudAct, payload: {} };
-              let state = reducer({ byId: {}, isFetching: true }, action);
-              assert.equal(state.isFetching, false);
-            });
-          });
-
-          ["CREATE", "READ", "UPDATE"].forEach(_crudAct => {
-            let crudAct = _crudAct + "__SUCCESS";
-            it(`The reducer should update the state 'byId' section on "${crudAct}"`, () => {
-              const action = { type: crudAct, payload: { byId: { c: 3 } } };
-              let state = reducer(
-                { byId: { a: 1, b: 2 }, isFetching: true },
-                action
-              );
-              assert.deepEqual(state.byId, { a: 1, b: 2, c: 3 });
-            });
-          });
-
-          it(`The reducer should update the state 'byId' section on "DELETE__SUCCESS"`, () => {
-            let crudAct = "DELETE__SUCCESS";
-            const action = { type: crudAct, payload: { id: "b" } };
-            let state = reducer(
-              { byId: { a: 1, b: 2 }, isFetching: true },
-              action
-            );
-            assert.deepEqual(state.byId, { a: 1 });
           });
         });
       });
