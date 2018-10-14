@@ -5,6 +5,57 @@ import {
 } from "./crud-error-types";
 
 /////////////////////////////////////////////////////////////////////
+////// REDUCER FACTORY //////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+
+export default function reducerFactory(actionTypes, customErrorHandler) {
+  typeCheckActionTypes(actionTypes);
+  typeCheckCustomErrorHandler(customErrorHandler);
+  let a = actionTypes;
+
+  let runtimeErrorHandler = customErrorHandler || defaultRuntimeErrorHandler;
+
+  let does = {
+    [a["CREATE"]]: createReadUpdateDelete,
+    [a["READ"]]: createReadUpdateDelete,
+    [a["UPDATE"]]: createReadUpdateDelete,
+    [a["DELETE"]]: createReadUpdateDelete,
+
+    [a["CREATE__SUCCESS"]]: successfulCreateReadUpdate,
+    [a["READ__SUCCESS"]]: successfulCreateReadUpdate,
+    [a["UPDATE__SUCCESS"]]: successfulCreateReadUpdate,
+    [a["DELETE__SUCCESS"]]: successfulDelete,
+
+    [["CREATE__FAILURE"]]: failedCreateReadUpdateDelete,
+    [["READ__FAILURE"]]: failedCreateReadUpdateDelete,
+    [["UPDATE__FAILURE"]]: failedCreateReadUpdateDelete,
+    [["DELETE__FAILURE"]]: failedCreateReadUpdateDelete
+  };
+
+  function reducer(
+    state = { byId: {}, isFetching: false, error: null },
+    action
+  ) {
+    try {
+      typeCheckState(state);
+      typeCheckAction(action);
+
+      if (does[action.type]) {
+        return does[action.type](state, action);
+      } else {
+        return state;
+      }
+    } catch (error) {
+      // unexpected run-time error
+      return runtimeErrorHandler(error, state, action);
+    }
+  }
+
+  reducer.extend = function() {};
+  return reducer;
+}
+
+/////////////////////////////////////////////////////////////////////
 ////// COMMON INTERNAL REDUCERS /////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
@@ -107,7 +158,7 @@ function typeCheckAction(action) {
 }
 
 /////////////////////////////////////////////////////////////////////
-////// REDUCER FACTORY //////////////////////////////////////////////
+////// DEFAULT RUNTIME ERROR HANDLER ////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
 function defaultRuntimeErrorHandler(error, state, action) {
@@ -122,51 +173,4 @@ function defaultRuntimeErrorHandler(error, state, action) {
     //emit global error
     dispatchAnUnexpectedErrorEvent(err);
   }
-}
-
-export default function reducerFactory(actionTypes, customErrorHandler) {
-  typeCheckActionTypes(actionTypes);
-  typeCheckCustomErrorHandler(customErrorHandler);
-  let a = actionTypes;
-
-  let runtimeErrorHandler = customErrorHandler || defaultRuntimeErrorHandler;
-
-  let does = {
-    [a["CREATE"]]: createReadUpdateDelete,
-    [a["READ"]]: createReadUpdateDelete,
-    [a["UPDATE"]]: createReadUpdateDelete,
-    [a["DELETE"]]: createReadUpdateDelete,
-
-    [a["CREATE__SUCCESS"]]: successfulCreateReadUpdate,
-    [a["READ__SUCCESS"]]: successfulCreateReadUpdate,
-    [a["UPDATE__SUCCESS"]]: successfulCreateReadUpdate,
-    [a["DELETE__SUCCESS"]]: successfulDelete,
-
-    [["CREATE__FAILURE"]]: failedCreateReadUpdateDelete,
-    [["READ__FAILURE"]]: failedCreateReadUpdateDelete,
-    [["UPDATE__FAILURE"]]: failedCreateReadUpdateDelete,
-    [["DELETE__FAILURE"]]: failedCreateReadUpdateDelete
-  };
-
-  function reducer(
-    state = { byId: {}, isFetching: false, error: null },
-    action
-  ) {
-    try {
-      typeCheckState(state);
-      typeCheckAction(action);
-
-      if (does[action.type]) {
-        return does[action.type](state, action);
-      } else {
-        return state;
-      }
-    } catch (error) {
-      // unexpected run-time error
-      return runtimeErrorHandler(error, state, action);
-    }
-  }
-
-  reducer.extend = function() {};
-  return reducer;
 }
