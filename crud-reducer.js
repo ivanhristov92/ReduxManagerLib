@@ -127,6 +127,21 @@ function typeCheckActionTypes(actionTypes) {
     });
 }
 
+function typeCheckOptions(options = {}) {
+  if (
+    (typeof options !== "undefined" && typeof options !== "object") ||
+    Array.isArray(options) ||
+    !options
+  ) {
+    throw new ModuleInitializationTypeError(
+      "'options' must be an object or undefined. Instead received: " +
+        JSON.stringify(options)
+    );
+  }
+  typeCheckAdditionalActions((options || {}).additionalActions);
+  typeCheckCustomErrorHandler((options || {}).customErrorHandler);
+}
+
 function typeCheckCustomErrorHandler(customErrorHandler) {
   if (
     typeof customErrorHandler !== "undefined" &&
@@ -139,7 +154,19 @@ function typeCheckCustomErrorHandler(customErrorHandler) {
   }
 }
 
-function typeCheckAdditionalActions(additionalActions) {}
+function typeCheckAdditionalActions(additionalActions) {
+  if (
+    typeof additionalActions !== "undefined" &&
+    (typeof additionalActions !== "object" ||
+      Array.isArray(additionalActions) ||
+      !additionalActions)
+  ) {
+    throw new ModuleInitializationTypeError(
+      "'additionalActions' must be an object or undefined. Instead received: " +
+        JSON.stringify(additionalActions)
+    );
+  }
+}
 
 // [RUNTIME]
 function typeCheckState(state) {
@@ -151,15 +178,6 @@ function typeCheckState(state) {
     throw new TypeError(
       "'state' must be an object or undefined. Instead received: " + state
     );
-  }
-}
-
-function typeCheckOptions(options = {}) {
-  if (options.additionalActions) {
-    typeCheckAdditionalActions(options.additionalActions);
-  }
-  if (options.customErrorHandler) {
-    typeCheckCustomErrorHandler(options.customErrorHandler);
   }
 }
 
