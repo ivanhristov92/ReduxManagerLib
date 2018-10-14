@@ -69,56 +69,69 @@ export default function reducerFactory(actionTypes, customErrorHandler) {
         throw new TypeError("'not a valid action'");
       }
 
-      switch (action.type) {
-        case (function() {
-          return a["CREATE"];
-        })():
-        case a["READ"]:
-        case a["UPDATE"]:
-        case a["DELETE"]:
-          return {
-            ...state,
-            isFetching: true,
-            error: null
-          };
-        case a["CREATE__SUCCESS"]:
-        case a["READ__SUCCESS"]:
-        case a["UPDATE__SUCCESS"]:
-          return {
-            ...state,
-            byId: {
-              ...state.byId,
-              ...action.payload.byId
-            },
-            isFetching: false,
-            error: null
-          };
-        case a["CREATE__FAILURE"]:
-        case a["READ__FAILURE"]:
-        case a["UPDATE__FAILURE"]:
-        case a["DELETE__FAILURE"]: {
-          if (!action.error) {
-            throw new TypeError(
-              "failure action needs to have an 'error' attribute"
-            );
-          }
-          return {
-            ...state,
-            isFetching: false,
-            error: action.error
-          };
+      function createReadUpdateDelete(state, action) {
+        return {
+          ...state,
+          isFetching: true,
+          error: null
+        };
+      }
+
+      function successfulCreateReadUpdate(state, action) {
+        return {
+          ...state,
+          byId: {
+            ...state.byId,
+            ...action.payload.byId
+          },
+          isFetching: false,
+          error: null
+        };
+      }
+
+      function failedCreateReadUpdateDelete(state, action) {
+        if (!action.error) {
+          throw new TypeError(
+            "failure action needs to have an 'error' attribute"
+          );
         }
+        return {
+          ...state,
+          isFetching: false,
+          error: action.error
+        };
+      }
 
-        case a["DELETE__SUCCESS"]:
-          return {
-            ...state,
-            byId: _.omit([action.payload.id], state.byId),
-            isFetching: false,
-            error: null
-          };
+      function successfulDelete(state, action) {
+        return {
+          ...state,
+          byId: _.omit([action.payload.id], state.byId),
+          isFetching: false,
+          error: null
+        };
+      }
 
-        default:
-          return state;
+      let does = {
+        [a["CREATE"]]: createReadUpdateDelete,
+        [a["READ"]]: createReadUpdateDelete,
+        [a["UPDATE"]]: createReadUpdateDelete,
+        [a["DELETE"]]: createReadUpdateDelete,
+
+        [a["CREATE__SUCCESS"]]: successfulCreateReadUpdate,
+        [a["READ__SUCCESS"]]: successfulCreateReadUpdate,
+        [a["UPDATE__SUCCESS"]]: successfulCreateReadUpdate,
+        [a["DELETE__SUCCESS"]]: successfulDelete,
+
+        [["CREATE__FAILURE"]]: failedCreateReadUpdateDelete,
+        [["READ__FAILURE"]]: failedCreateReadUpdateDelete,
+        [["UPDATE__FAILURE"]]: failedCreateReadUpdateDelete,
+        [["DELETE__FAILURE"]]: failedCreateReadUpdateDelete
+      };
+
+      if (does[action.type]) {
+        return does[action.type](state, action);
+      } else {
+        return state;
       }
     } catch (error) {
       // unexpected run-time error
