@@ -57,7 +57,7 @@ export default function reducerFactory(actionTypes, customErrorHandler) {
         );
       }
 
-      if (!action.type) {
+      if (typeof action !== "object" || !action.type) {
         throw new TypeError("'not a valid action'");
       }
 

@@ -107,6 +107,47 @@ describe("CRUD Rest Api", () => {
             });
           });
         });
+
+        describe("'action'", () => {
+          it("[ACCEPTS] an object with 'type'", () => {
+            const { mockActionTypes } = createMocks();
+            const reducer = reducerFactory(mockActionTypes);
+            assert.doesNotThrow(function() {
+              reducer(undefined, { type: "test" });
+            }, Error);
+          });
+
+          [
+            null,
+            2,
+            false,
+            true,
+            Error,
+            function() {},
+            [],
+            "",
+            "string",
+            {}
+          ].forEach(data => {
+            it(`[THROWS][HANDLES] should call an error handler internally if 'action' is of type ${typeof data}: ${JSON.stringify(
+              data
+            )}`, () => {
+              const { mockActionTypes } = createMocks();
+              let errorHandler = {
+                errorHandler() {}
+              };
+              sinon.spy(errorHandler, "errorHandler");
+              const reducer = reducerFactory(
+                mockActionTypes,
+                errorHandler.errorHandler
+              );
+
+              reducer(undefined, data);
+              const errorHandlerCall = errorHandler.errorHandler.getCall(0);
+              assert.notEqual(errorHandlerCall, null);
+            });
+          });
+        });
       });
 
       describe("[RETURNS]", () => {});
