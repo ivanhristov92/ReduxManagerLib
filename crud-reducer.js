@@ -102,13 +102,31 @@ function successfulDelete(state, action) {
 }
 
 /////////////////////////////////////////////////////////////////////
+////// DEFAULT RUNTIME ERROR HANDLER ////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+
+function defaultRuntimeErrorHandler(error, state, action) {
+  try {
+    dispatchAnUnexpectedErrorEvent(error);
+
+    return {
+      ...state,
+      error: error
+    };
+  } catch (err) {
+    //emit global error
+    dispatchAnUnexpectedErrorEvent(err);
+  }
+}
+
+/////////////////////////////////////////////////////////////////////
 ////// TYPE CHECKERS ////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
 // [MODULE INITIALIZATION]
 
 function typeCheckActionTypes(actionTypes) {
-  if (!actionTypes || typeof actionTypes !== "object") {
+  if (!isObject(actionTypes)) {
     throw new ModuleInitializationTypeError(
       `'actionTypes' must be a valid ActionTypes object`
     );
@@ -128,10 +146,7 @@ function typeCheckActionTypes(actionTypes) {
 }
 
 function typeCheckOptions(options) {
-  if (
-    typeof options !== "undefined" &&
-    (typeof options !== "object" || Array.isArray(options) || !options)
-  ) {
+  if (!isOptionalObject(options)) {
     throw new ModuleInitializationTypeError(
       "'options' must be an object or undefined. Instead received: " +
         JSON.stringify(options)
@@ -154,12 +169,7 @@ function typeCheckCustomErrorHandler(customErrorHandler) {
 }
 
 function typeCheckAdditionalActions(additionalActions) {
-  if (
-    typeof additionalActions !== "undefined" &&
-    (typeof additionalActions !== "object" ||
-      Array.isArray(additionalActions) ||
-      !additionalActions)
-  ) {
+  if (!isOptionalObject(additionalActions)) {
     throw new ModuleInitializationTypeError(
       "'additionalActions' must be an object or undefined. Instead received: " +
         JSON.stringify(additionalActions)
@@ -169,11 +179,7 @@ function typeCheckAdditionalActions(additionalActions) {
 
 // [RUNTIME]
 function typeCheckState(state) {
-  if (
-    (typeof state !== "undefined" && typeof state !== "object") ||
-    Array.isArray(state) ||
-    !state
-  ) {
+  if (!isOptionalObject(state)) {
     throw new TypeError(
       "'state' must be an object or undefined. Instead received: " + state
     );
@@ -181,25 +187,16 @@ function typeCheckState(state) {
 }
 
 function typeCheckAction(action) {
-  if (typeof action !== "object" || !action.type) {
+  if (!isObject(action) || !action.type) {
     throw new TypeError("'not a valid action'");
   }
 }
 
-/////////////////////////////////////////////////////////////////////
-////// DEFAULT RUNTIME ERROR HANDLER ////////////////////////////////
-/////////////////////////////////////////////////////////////////////
+// helpers
+function isObject(value) {
+  return typeof value === "object" && !Array.isArray(value) && value;
+}
 
-function defaultRuntimeErrorHandler(error, state, action) {
-  try {
-    dispatchAnUnexpectedErrorEvent(error);
-
-    return {
-      ...state,
-      error: error
-    };
-  } catch (err) {
-    //emit global error
-    dispatchAnUnexpectedErrorEvent(err);
-  }
+function isOptionalObject(value) {
+  return typeof value === "undefined" || isObject(value);
 }

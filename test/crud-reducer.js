@@ -3,6 +3,8 @@ import actionCreatorsFactory from "../crud-action-creators";
 var assert = require("assert");
 var sinon = require("sinon");
 
+import * as _ from "ramda";
+
 import reducerFactory from "../crud-reducer";
 
 import createMocks from "./create-mocks";
