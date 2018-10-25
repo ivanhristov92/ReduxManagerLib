@@ -1,35 +1,8 @@
 export default function restApiFactory() {
   return {
-    create(objects) {
+    create(payload) {
       return new Promise((resolve, reject) => {
-        if (!Array.isArray(objects)) {
-          reject(
-            new TypeError(
-              "'create' expects am array of objects. You provided: " +
-                typeof objects
-            )
-          );
-        }
-        if (objects.length === 0) {
-          reject(
-            new TypeError(
-              "'create' expects am array of objects. You provided an empty array"
-            )
-          );
-        }
-
-        let response = objects.reduce(
-          (acc, obj, i) => {
-            return {
-              ...acc,
-              byId: {
-                ...acc.byId,
-                [i]: obj
-              }
-            };
-          },
-          { byId: {} }
-        );
+        let response = { byId: {} };
         resolve(response);
       });
     },

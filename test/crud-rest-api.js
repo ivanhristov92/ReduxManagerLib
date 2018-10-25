@@ -43,25 +43,6 @@ describe("CRUD Rest Api", () => {
 
   describe("[RUNTIME SIGNATURE]", () => {
     describe("create", function() {
-      describe(`[EXPECTS] the function must require as a 0 argument - an array of objects`, () => {
-        it("[REJECTS] should reject if no argument is provided", done => {
-          let restApi = restApiFactory();
-
-          restApi.create().catch(error => {
-            assert.equal(error instanceof Error, true);
-            done();
-          });
-        });
-        it("[REJECTS] should reject if it is passed an empty array", done => {
-          let restApi = restApiFactory();
-
-          restApi.create([]).catch(error => {
-            assert.equal(error instanceof Error, true);
-            done();
-          });
-        });
-      });
-
       describe("[RETURNS]", () => {
         describe("[CORRECT TYPE]", () => {
           it(`the 'create' function must return a Promise`, () => {
