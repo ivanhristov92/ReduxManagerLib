@@ -31,6 +31,7 @@ Without normalization of the data, the selectors need to be custom made, the red
 	= create(data: [Object]){}
 	= read(); read([id: any]){}
 	= update([id: any], data: Object)
+	= delete([id: any])
 
 
 3. Naming
@@ -40,9 +41,8 @@ b. Action Types – ModelName/SOME_ACTION__STATE
 c. Action Creators – ModelName.(verb + State) : MyModel.(create | createSuccess)()
 = verbs – create, read, update, delete
 = states – Success, Failure
-d. State name – model name
-e. Selectors – all selectors begin with “get”
-= verbs – get (optional getOne), getIds, getCount
+d. Selectors – all selectors begin with “get”
+= verbs – getOne, getSome, getAll, getCount
 
 4. Actions – actions follow the flux standard (type, error and payload), and an additional meta information section, which is optional.
 
@@ -83,8 +83,11 @@ Who uses middleware → error dispatcher
 = Type Errors
 = Runtime Errors
 - Selectors
-= Type Errors
-= Runtime Errors
+= Runtime Errors – catch them and emit  UnexpectedRuntimeError events,     handled globally + return a default value
+== default values:
+=== getOne: {}
+=== getSome: []
+=== getAll: {} | [] - depending on the options
 
 Crucial User Facing Interface
 
@@ -205,6 +208,7 @@ Signature Of Exports
 		[CORRECT TYPE] correct values (objects, classes, 											functions, primitives);
 		[CORRECT VALUE]
 
+[OPERATION] – for testing the way functions operate, that they 					make the necessary function calls internally, for 					example
 
 
 
@@ -215,5 +219,11 @@ Signature Of Exports
 
 
 
+Dependency Diagram/ Module Interfaces
 
-Dependency Diagram
+
+demo
+
+1. connect the reducer X
+2. fire an action from react
+2.1 connect actions to a container
