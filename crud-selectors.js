@@ -18,10 +18,10 @@ export default function selectorsFactory(options) {
       typeCheckState(state);
       typeCheckFormat(format);
 
-      return format === "array" ? Object.values(state.byId) : state.byId;
+      return format === "map" ? state.byId : Object.values(state.byId);
     } catch (error) {
       runtimeErrorHandler(error, { state, format, selector: "getAll" });
-      return format === "array" ? [] : {};
+      return format === "map" ? {} : [];
     }
   }
 
