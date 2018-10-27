@@ -1,7 +1,7 @@
 import selectorsFactory from "../crud-selectors";
 var assert = require("assert");
 import * as _ from "ramda";
-import actionCreatorsFactory from "../crud-action-creators";
+var sinon = require("sinon");
 
 describe("CRUD SELECTORS", () => {
   describe("[EXPORTS]", () => {
@@ -78,13 +78,74 @@ describe("CRUD SELECTORS", () => {
       describe(method, () => {
         describe("[EXPECTS]", () => {
           describe("state as 0th argument", () => {
-            it("[ACCEPTS] an object", () => {
+            it("[ACCEPTS] an object with 'byId' and 'isFetching'", () => {
               const selectors = selectorsFactory();
-              selectors.getSome();
+              assert.doesNotThrow(function() {
+                selectors[method]({ byId: {}, isFetching: false });
+              }, Error);
             });
-            it("[THORWS][HANDLES]", () => {});
+          });
+
+          describe(`[THROWS][HANDLES] when 'state' is not an object`, () => {
+            [
+              null,
+              false,
+              true,
+              Error,
+              function() {},
+              {},
+              { byId: {} },
+              { byId: [] },
+              { isFetching: true },
+              { isFetching: "", byId: {} },
+              { isFetching: true, byId: [] },
+              "test",
+              []
+            ].forEach((value, index) => {
+              it(`${index} [CALLS] the 'customErrorHandler' when 'state' is a ${typeof value} : ${value}`, () => {
+                let options = { customErrorHandler: function() {} };
+                sinon.spy(options, "customErrorHandler");
+                const selectors = selectorsFactory(options);
+
+                selectors[method](value);
+                let errorCall = options.customErrorHandler.getCall(0);
+                assert.notEqual(errorCall, null);
+              });
+            });
+          });
+          describe(`[HANDLES][RETURNS] when 'state' is not an object a default value is returned`, () => {
+            [
+              null,
+              false,
+              true,
+              Error,
+              function() {},
+              {},
+              { byId: {} },
+              { byId: [] },
+              { isFetching: true },
+              { isFetching: "", byId: {} },
+              { isFetching: true, byId: [] },
+              "test",
+              []
+            ].forEach((value, index) => {
+              it(`${index} Method ${method} returns a default value, when an error occurs`, () => {
+                let options = { customErrorHandler: function() {} };
+                const selectors = selectorsFactory(options);
+                let fallbackValue = selectors[method](value);
+                assert.notEqual(typeof fallbackValue, "undefined");
+              });
+            });
           });
         });
+      });
+    });
+  });
+
+  describe("[OPERATION]", () => {
+    ["getOne", "getSome", "getAll"].forEach(method => {
+      describe(method, () => {
+        it("[CALLS] the custome error handler", () => {});
       });
     });
   });

@@ -15,6 +15,7 @@ export default function selectorsFactory(options) {
 
   function getAll(state, asArray) {
     try {
+      typeCheckState(state);
       return asArray ? Object.values(state.byId) : state.byId;
     } catch (error) {
       runtimeErrorHandler(error, { state, asArray, selector: "getAll" });
@@ -24,6 +25,7 @@ export default function selectorsFactory(options) {
 
   function getOne(state, id) {
     try {
+      typeCheckState(state);
       return state.byId[id];
     } catch (error) {
       runtimeErrorHandler(error, { state, id, selector: "getOne" });
@@ -33,6 +35,7 @@ export default function selectorsFactory(options) {
 
   function getSome(state, ids = []) {
     try {
+      typeCheckState(state);
       return ids.map(id => state.byId[id]);
     } catch (error) {
       runtimeErrorHandler(error, { state, ids, selector: "getSome" });
@@ -59,6 +62,25 @@ function typeCheckOptions(options) {
       `Expected an 'customErrorHandler' to be a function, instead received ${typeof options.customErrorHandler}: ${
         options.customErrorHandler
       }`
+    );
+  }
+}
+
+function typeCheckState(state) {
+  if (!isObject(state)) {
+    throw new TypeError(
+      `Expected state to be a valid State object, instead received ${typeof state}: ${"" +
+        state}`
+    );
+  }
+  if (!isObject(state.byId)) {
+    throw new TypeError(
+      `Expected state to have a 'byId' property, instead received ${typeof state}: ${state}`
+    );
+  }
+  if (typeof state.isFetching !== "boolean") {
+    throw new TypeError(
+      `Expected state to have an 'isFetching' property, instead received ${typeof state}: ${state}`
     );
   }
 }
