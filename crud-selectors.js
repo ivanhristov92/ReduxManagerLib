@@ -13,13 +13,15 @@ export default function selectorsFactory(options) {
     dispatchAnUnexpectedErrorEvent(error, { state, action });
   }
 
-  function getAll(state, asArray) {
+  function getAll(state, format) {
     try {
       typeCheckState(state);
-      return asArray ? Object.values(state.byId) : state.byId;
+      typeCheckFormat(format);
+
+      return format === "array" ? Object.values(state.byId) : state.byId;
     } catch (error) {
-      runtimeErrorHandler(error, { state, asArray, selector: "getAll" });
-      return asArray ? [] : {};
+      runtimeErrorHandler(error, { state, format, selector: "getAll" });
+      return format === "array" ? [] : {};
     }
   }
 
@@ -34,12 +36,20 @@ export default function selectorsFactory(options) {
     }
   }
 
-  function getSome(state, ids = []) {
+  function getSome(state, ids, format) {
     try {
       typeCheckState(state);
-      return ids.map(id => state.byId[id]);
+      typeCheckIds(ids);
+      typeCheckFormat(format);
+      if (format === "map") {
+        return ids.reduce((acc, id) => {
+          return Object.assign(acc, { [id]: state.byId[id] });
+        }, {});
+      } else {
+        return ids.map(id => state.byId[id]);
+      }
     } catch (error) {
-      runtimeErrorHandler(error, { state, ids, selector: "getSome" });
+      runtimeErrorHandler(error, { state, ids, format, selector: "getSome" });
       return [];
     }
   }
@@ -99,16 +109,39 @@ function isOptionalFunction(func) {
   return typeof func === "undefined" || typeof func === "function";
 }
 
+function typeCheckIds(ids) {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    throw new TypeError(
+      `Expected ids to be a non-empty array of strings or a numbers, instead receive ${typeof ids} ${ids}`
+    );
+  }
+  ids.forEach(typeCheckId);
+}
+
 function typeCheckId(id) {
-  function error() {
+  if (!isValidId(id)) {
     throw new TypeError(
       `Expected id to be a non-empty string or a number, instead receive ${typeof id} ${id}`
     );
   }
+}
+
+function isValidId(id) {
   if (id === "") {
-    error();
+    return false;
   }
   if (typeof id !== "string" && typeof id !== "number") {
-    error();
+    return false;
+  }
+  return true;
+}
+
+function typeCheckFormat(format) {
+  if (typeof format !== "undefined") {
+    if (format !== "map" && format !== "array") {
+      throw new TypeError(
+        `Expected format to be "array" or "map", instead receive ${typeof format} ${format}`
+      );
+    }
   }
 }

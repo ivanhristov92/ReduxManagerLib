@@ -147,14 +147,6 @@ describe("CRUD SELECTORS", () => {
       });
     }
 
-    // ["getOne", "getSome", "getAll"].forEach(method => {
-    //   describe(method, () => {
-    //     describe("[EXPECTS]", () => {
-    //       testStateArgument(method);
-    //     });
-    //   });
-    // });
-
     describe("getOne", () => {
       describe("[EXPECTS]", () => {
         testStateArgument("getOne", "testId");
@@ -181,6 +173,9 @@ describe("CRUD SELECTORS", () => {
               const errorHandlerCall = options.customErrorHandler.getCall(0);
               assert.equal(errorHandlerCall, null);
             });
+          });
+
+          describe("[THROWS][HANDLES]", () => {
             [
               Boolean,
               function() {},
@@ -212,13 +207,110 @@ describe("CRUD SELECTORS", () => {
     describe("getSome", () => {
       describe("[EXPECTS]", () => {
         testStateArgument("getSome");
-        describe("'ids' for argument 1", () => {});
+        describe("'ids' for argument 1", () => {
+          describe("[ACCEPTS]", () => {
+            it("[ACCEPTS] a non-empty array of strings or numbers", () => {
+              let options = { customErrorHandler() {} };
+              sinon.spy(options, "customErrorHandler");
+              assert.doesNotThrow(function() {
+                selectorsFactory().getSome({ byId: {}, isFetching: false }, [
+                  1,
+                  "non empty"
+                ]);
+              });
+              const errorHandlerCall = options.customErrorHandler.getCall(0);
+              assert.equal(errorHandlerCall, null);
+            });
+          });
+
+          describe("[THROWS][HANDLES]", () => {
+            [
+              Boolean,
+              function() {},
+              "",
+              false,
+              null,
+              undefined,
+              {},
+              [Boolean, false, 22, ""],
+              [Boolean],
+              [false],
+              [""]
+            ].forEach((value, index) => {
+              it(`${index} [THROWS][HANDLES] when the ids are not valid ids and not in an array, but a ${typeof value}: ${value}`, () => {
+                let options = { customErrorHandler() {} };
+                sinon.spy(options, "customErrorHandler");
+                assert.doesNotThrow(function() {
+                  selectorsFactory(options).getSome(
+                    { byId: {}, isFetching: false },
+                    value
+                  );
+                });
+                const errorHandlerCall = options.customErrorHandler.getCall(0);
+                assert.notEqual(errorHandlerCall, null);
+              });
+            });
+          });
+        });
+        describe("'format' as last argument", () => {
+          describe("[ACCEPTS]", () => {
+            ["map", "array", undefined].forEach(format => {
+              it(`[CORRECT VALUE] '${format}'`, () => {
+                let options = { customErrorHandler() {} };
+                sinon.spy(options, "customErrorHandler");
+                assert.doesNotThrow(function() {
+                  selectorsFactory(options).getOne(
+                    { byId: {}, isFetching: false },
+                    "non-empty id",
+                    format
+                  );
+                });
+                const errorHandlerCall = options.customErrorHandler.getCall(0);
+                assert.equal(errorHandlerCall, null);
+              });
+            });
+          });
+          describe("[THROWS][HANDLES]", () => {
+            [
+              Boolean,
+              function() {},
+              "",
+              false,
+              null,
+              {},
+              [Boolean, false, 22, ""],
+              [Boolean],
+              [false],
+              [""]
+            ].forEach((format, index) => {
+              it(`${index} [THROWS][HANDLES] when instead of "map" or "array" it receives ${typeof format}: ${format}`, () => {
+                let options = { customErrorHandler() {} };
+                sinon.spy(options, "customErrorHandler");
+                assert.doesNotThrow(function() {
+                  selectorsFactory(options).getSome(
+                    { byId: {}, isFetching: false },
+                    ["someId"],
+                    format
+                  );
+                });
+                const errorHandlerCall = options.customErrorHandler.getCall(0);
+                assert.notEqual(errorHandlerCall, null);
+              });
+            });
+          });
+        });
       });
     });
 
     describe("getAll", () => {
       describe("[EXPECTS]", () => {
         testStateArgument("getAll");
+        describe("'format' as last argument", () => {
+          describe("[ACCEPTS]", () => {
+            it("[CORRECT VALUE] 'array'", () => {});
+            it("[CORRECT VALUE] 'map'", () => {});
+          });
+        });
       });
     });
   });
