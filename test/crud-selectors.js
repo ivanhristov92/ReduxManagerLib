@@ -494,4 +494,32 @@ describe("CRUD SELECTORS", () => {
       });
     });
   });
+
+  describe("[OPERATION]", () => {
+    describe("'customErrorHandler'", () => {
+      ["getOne", "getSome", "getAll"].forEach(function(method) {
+        let options = { customErrorHandler() {} };
+        sinon.spy(options, "customErrorHandler");
+        let selectors = selectorsFactory(options);
+        console.log(method);
+        const state = false;
+        selectors[method](state);
+        let errorHandlerCall = options.customErrorHandler.getCall(0);
+
+        it("[CALLS] customErroHandler", () => {
+          assert.notEqual(errorHandlerCall, null);
+        });
+
+        describe("[CALLS] custommErrorHandler with the right arguments", () => {
+          it("[CORRECT TYPE] 0th arg is the Error", () => {
+            assert.equal(errorHandlerCall.args[0] instanceof Error, true);
+          });
+
+          it("[CORRECT TYPE]1st arg is the 'details' object", () => {
+            assert.equal(typeof errorHandlerCall.args[1] === "object", true);
+          });
+        });
+      });
+    });
+  });
 });
