@@ -26,6 +26,7 @@ export default function selectorsFactory(options) {
   function getOne(state, id) {
     try {
       typeCheckState(state);
+      typeCheckId(id);
       return state.byId[id];
     } catch (error) {
       runtimeErrorHandler(error, { state, id, selector: "getOne" });
@@ -96,4 +97,18 @@ function isOptionalObject(value) {
 
 function isOptionalFunction(func) {
   return typeof func === "undefined" || typeof func === "function";
+}
+
+function typeCheckId(id) {
+  function error() {
+    throw new TypeError(
+      `Expected id to be a non-empty string or a number, instead receive ${typeof id} ${id}`
+    );
+  }
+  if (id === "") {
+    error();
+  }
+  if (typeof id !== "string" && typeof id !== "number") {
+    error();
+  }
 }
