@@ -1,3 +1,5 @@
+import { ModuleInitializationTypeError } from "./crud-error-types";
+
 function extend(additionalProperties) {
   if (
     typeof additionalProperties !== "object" ||
@@ -31,6 +33,16 @@ export function typeCheckExtensions(additionalProperties) {
 import * as _ from "ramda";
 
 export function bindSelectorsToState(subStateGetter, selectors) {
+  if (
+    (typeof subStateGetter !== "string" &&
+      typeof subStateGetter !== "function") ||
+    subStateGetter === ""
+  ) {
+    throw new ModuleInitializationTypeError(
+      `bindSelectorsToState expects a string or function as its 0th argument, intead it received ${typeof subStateGetter}: ${subStateGetter}`
+    );
+  }
+
   if (typeof subStateGetter === "string") {
     subStateGetter = _.prop(subStateGetter);
   }
@@ -41,7 +53,7 @@ export function bindSelectorsToState(subStateGetter, selectors) {
     let newArgs = [state, ...rest];
     return sel(...newArgs);
   };
-  const bindRec = _.map(selector => {
+  const bindRecursively = _.map(selector => {
     let type = typeof selector;
 
     if (type === "undefined") {
@@ -53,9 +65,9 @@ export function bindSelectorsToState(subStateGetter, selectors) {
     }
 
     if (type === "object") {
-      return bindRec(selector);
+      return bindRecursively(selector);
     }
   });
 
-  return bindRec(selectors);
+  return bindRecursively(selectors);
 }
