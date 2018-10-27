@@ -50,7 +50,7 @@ export default function reducerFactory(actionTypes, options) {
       }
     } catch (error) {
       // unexpected run-time error
-      return runtimeErrorHandler(error, state, action);
+      return runtimeErrorHandler(error, { state, action });
     }
   }
 
@@ -105,9 +105,9 @@ function successfulDelete(state, action) {
 ////// DEFAULT RUNTIME ERROR HANDLER ////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
-function defaultRuntimeErrorHandler(error, state, action) {
+function defaultRuntimeErrorHandler(error, { state, action }) {
   try {
-    dispatchAnUnexpectedErrorEvent(error);
+    dispatchAnUnexpectedErrorEvent(error, { state, action });
 
     return {
       ...state,
@@ -115,7 +115,7 @@ function defaultRuntimeErrorHandler(error, state, action) {
     };
   } catch (err) {
     //emit global error
-    dispatchAnUnexpectedErrorEvent(err);
+    dispatchAnUnexpectedErrorEvent(err, { state, action });
   }
 }
 

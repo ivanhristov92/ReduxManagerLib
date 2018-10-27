@@ -7,13 +7,22 @@ export default function restApiFactory() {
       });
     },
     read(payload) {
-      return new Promise((res, rej) => {});
+      return new Promise((resolve, reject) => {
+        let response = { byId: {} };
+        resolve(response);
+      });
     },
     update(payload) {
-      return new Promise((res, rej) => {});
+      return new Promise((resolve, reject) => {
+        let response = { byId: {} };
+        resolve(response);
+      });
     },
     delete(payload) {
-      return new Promise((res, rej) => {});
+      return new Promise((resolve, reject) => {
+        let response = { byId: {} };
+        resolve(response);
+      });
     }
   };
 }

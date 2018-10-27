@@ -1,13 +1,15 @@
 import * as _ from "ramda";
 import { ModuleInitializationTypeError } from "./crud-error-types";
-import { addExtendFunctionality } from "./utils";
+import { typeCheckExtensions } from "./utils";
 
-export default function actionTypesFactory(modelName) {
+export default function actionTypesFactory(modelName, additionalActionTypes) {
   if (typeof modelName !== "string" || modelName === "") {
     throw new ModuleInitializationTypeError(
       `'modelName' is required to be a non-empty string, instead got ${typeof modelName} : ${modelName}`
     );
   }
+
+  typeCheckExtensions(additionalActionTypes);
 
   const addModelName = _.map(actionTypeValue => {
     return `${modelName}/${actionTypeValue}`;
@@ -28,5 +30,6 @@ export default function actionTypesFactory(modelName) {
     DELETE__FAILURE: "DELETE__FAILURE"
   });
 
-  return addExtendFunctionality(actionTypes);
+  let extendedActionTypes = Object.assign(actionTypes, additionalActionTypes);
+  return extendedActionTypes;
 }

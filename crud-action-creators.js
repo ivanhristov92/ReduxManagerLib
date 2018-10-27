@@ -11,7 +11,7 @@ import {
   dispatchAnUnexpectedErrorEvent,
   ModuleInitializationTypeError
 } from "./crud-error-types";
-import { addExtendFunctionality } from "./utils";
+import { typeCheckExtensions } from "./utils";
 
 //////////////////////////////////////////////////////
 ////// INTERNAL THUNK FACTORY ////////////////////////
@@ -61,7 +61,12 @@ const _thunkFactory = _.curry(function(
           });
       } catch (error) {
         // emit a global error event
-        dispatchAnUnexpectedErrorEvent(error);
+        dispatchAnUnexpectedErrorEvent(error, {
+          crudMethod,
+          payload,
+          actionTyp: actionTypes[actionTypeKey],
+          actionTypeKey
+        });
       }
     };
   };
@@ -71,7 +76,11 @@ const _thunkFactory = _.curry(function(
 ////// ACTION CREATORS FACTORY //////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
-export default function actionCreatorsFactory(_actionTypes, _restApiInstance) {
+export default function actionCreatorsFactory(
+  _actionTypes,
+  _restApiInstance,
+  additionalActionCreators
+) {
   if (!_actionTypes) {
     throw new ModuleInitializationTypeError(
       "'actionTypes' is required as an argument"
@@ -84,6 +93,8 @@ export default function actionCreatorsFactory(_actionTypes, _restApiInstance) {
     );
   }
 
+  typeCheckExtensions(additionalActionCreators);
+
   let actionTypes = _.clone(_actionTypes);
   let restApiInstance = _.clone(_restApiInstance);
 
@@ -95,5 +106,6 @@ export default function actionCreatorsFactory(_actionTypes, _restApiInstance) {
     update: thunkFactory("update"),
     delete: thunkFactory("delete")
   };
-  return addExtendFunctionality(actionCreators);
+
+  return Object.assign(actionCreators, additionalActionCreators);
 }

@@ -12,9 +12,16 @@ export class UnexpectedRuntimeError extends Error {
   }
 }
 
-export function dispatchAnUnexpectedErrorEvent(error) {
+export function dispatchAnUnexpectedErrorEvent(error, details) {
   let event = new window.CustomEvent("unexpectedruntimeerror", {
-    detail: new UnexpectedRuntimeError(error)
+    detail: { error: new UnexpectedRuntimeError(error), details }
   });
   document.dispatchEvent(event);
+}
+
+export function attachAnUnexpectedErrorLogger() {
+  document.addEventListener("unexpectedruntimeerror", reduxManagerLibError => {
+    console.log(reduxManagerLibError.detail);
+    console.log(reduxManagerLibError.detail.error);
+  });
 }
