@@ -54,11 +54,7 @@ function typeCheckOptions(options) {
     );
   }
 
-  if (
-    isObject(options) &&
-    typeof options.customErrorHandler !== "undefined" &&
-    typeof options.customErrorHandler !== "function"
-  ) {
+  if (isObject(options) && !isOptionalFunction(options.customErrorHandler)) {
     throw new ModuleInitializationTypeError(
       `Expected an 'customErrorHandler' to be a function, instead received ${typeof options.customErrorHandler}: ${
         options.customErrorHandler
@@ -74,4 +70,8 @@ function isObject(value) {
 
 function isOptionalObject(value) {
   return typeof value === "undefined" || isObject(value);
+}
+
+function isOptionalFunction(func) {
+  return typeof func === "undefined" || typeof func === "function";
 }
