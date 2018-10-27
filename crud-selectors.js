@@ -54,11 +54,15 @@ export default function selectorsFactory(options) {
     }
   }
 
-  return {
-    getAll,
-    getOne,
-    getSome
-  };
+  let additionalSelectors = (options && options.additional) || {};
+  return Object.assign(
+    {
+      getAll,
+      getOne,
+      getSome
+    },
+    additionalSelectors
+  );
 }
 
 function typeCheckOptions(options) {
@@ -74,6 +78,24 @@ function typeCheckOptions(options) {
         options.customErrorHandler
       }`
     );
+  }
+
+  if (isObject(options)) {
+    if (!isOptionalObject(options.additional)) {
+      throw new ModuleInitializationTypeError(
+        `Expected 'options.additional' to be an object, instead received ${typeof options.additional}: ${
+          options.additional
+        }`
+      );
+    } else {
+      Object.values(options.additional || {}).forEach(value => {
+        if (typeof value !== "function") {
+          throw new ModuleInitializationTypeError(
+            `Expected 'options.additional' to be an object containing functions, instead received  ${typeof value}: ${value}`
+          );
+        }
+      });
+    }
   }
 }
 

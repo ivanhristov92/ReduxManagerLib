@@ -29,6 +29,11 @@ describe("CRUD SELECTORS", () => {
               selectorsFactory({ customErrorHandler: function() {} });
             }, Error);
           });
+          it("[CORRECT TYPE] options.additional object", () => {
+            assert.doesNotThrow(function() {
+              selectorsFactory({ additional: { method: function() {} } });
+            }, Error);
+          });
         });
 
         describe("[THROWS] a ModuleInitializationTypeError", () => {
@@ -47,6 +52,28 @@ describe("CRUD SELECTORS", () => {
             it(`[THROWS] when customErrorHandler is not a function, but a ${typeof value}: ${value}`, () => {
               try {
                 selectorsFactory({ customErrorHandler: value });
+                assert.equal(false, true, "Should have thrown");
+              } catch (err) {
+                assert.equal(err.name, "ModuleInitializationTypeError");
+              }
+            });
+          });
+
+          [null, false, true, "", "test", [], function() {}].forEach(value => {
+            it(`[THROWS] when 'additional' is not an object, but a ${typeof value}: ${value}`, () => {
+              try {
+                selectorsFactory({ additional: value });
+                assert.equal(false, true, "Should have thrown");
+              } catch (err) {
+                assert.equal(err.name, "ModuleInitializationTypeError");
+              }
+            });
+          });
+
+          [null, false, true, "", "test", []].forEach(value => {
+            it(`[THROWS] when 'additional' contains other than functions - ${typeof value}: ${value}`, () => {
+              try {
+                selectorsFactory({ additional: { method: value } });
                 assert.equal(false, true, "Should have thrown");
               } catch (err) {
                 assert.equal(err.name, "ModuleInitializationTypeError");
