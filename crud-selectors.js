@@ -50,7 +50,7 @@ export default function selectorsFactory(options) {
       }
     } catch (error) {
       runtimeErrorHandler(error, { state, ids, format, selector: "getSome" });
-      return [];
+      return format === "map" ? {} : [];
     }
   }
 

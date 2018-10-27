@@ -201,6 +201,7 @@ describe("CRUD SELECTORS", () => {
           });
         });
       });
+
       describe("[RETURNS]", () => {
         it("[CORRECT VALUE] it returns the selected entry by a string id", () => {
           let selectors = selectorsFactory({ customErrorHandler() {} });
@@ -218,6 +219,18 @@ describe("CRUD SELECTORS", () => {
           let id = 222;
           let returnValue = selectors.getOne(state, id);
           assert.deepEqual(returnValue, testEntry);
+        });
+
+        it("[CORRECT VALUE][CORRECT TYPE] when an error occurs it returns an {}", () => {
+          let selectors = selectorsFactory({ customErrorHandler() {} });
+          let testEntry = { id: 222 };
+          let state = { byId: { 222: testEntry }, isFetching: false };
+          let id = 222;
+          let returnValue = selectors.getOne(state, false);
+
+          assert.equal(typeof returnValue, "object");
+          assert.equal(Array.isArray(returnValue), false);
+          assert.deepEqual(returnValue, {});
         });
       });
     });
@@ -331,11 +344,17 @@ describe("CRUD SELECTORS", () => {
             };
             let ids = [111, 222];
             let returnValue = selectors.getSome(state, ids, format);
-            it("[CORRECT TYPE] it returns an array of entries, when no 'format' is passed", () => {
+            it(`[CORRECT TYPE] it returns an array of entries, when 'format === ${format}' is passed`, () => {
               assert.equal(Array.isArray(returnValue), true);
             });
-            it("[CORRECT VALUE] correctly returns an array of entries, when no 'format' is passed", () => {
+            it(`[CORRECT VALUE] correctly returns an array of entries, when no 'format === ${format}' is passed`, () => {
               assert.deepEqual(returnValue, [testEntry1, testEntry2]);
+            });
+
+            it(`[CORRECT VALUE][CORRECT TYPE] when 'format === ${format}' and an error occurs it returns an []`, () => {
+              let returnValue = selectors.getSome(state, null, format);
+              assert.equal(Array.isArray(returnValue), true);
+              assert.deepEqual(returnValue, []);
             });
           });
         });
@@ -350,14 +369,21 @@ describe("CRUD SELECTORS", () => {
           };
           let ids = [111, 222];
           let returnValue = selectors.getSome(state, ids, "map");
-          it("[CORRECT TYPE] it returns an array of entries, when no 'format' is passed", () => {
+          it("[CORRECT TYPE] it returns an array of entries, when 'format === map' is passed", () => {
             assert.equal(
               typeof returnValue === "object" && !Array.isArray(returnValue),
               true
             );
           });
-          it("[CORRECT VALUE] correctly returns an array of entries, when no 'format' is passed", () => {
+          it("[CORRECT VALUE] correctly returns an array of entries, when 'format === map' is passed", () => {
             assert.deepEqual(returnValue, { 111: testEntry1, 222: testEntry2 });
+          });
+
+          it("[CORRECT VALUE][CORRECT TYPE] when 'format === map' and an error occurs it returns an {}", () => {
+            let returnValue = selectors.getSome(state, null, "map");
+            assert.equal(typeof returnValue, "object");
+            assert.equal(Array.isArray(returnValue), false);
+            assert.deepEqual(returnValue, {});
           });
         });
       });
@@ -424,11 +450,17 @@ describe("CRUD SELECTORS", () => {
               isFetching: false
             };
             let returnValue = selectors.getAll(state, format);
-            it("[CORRECT TYPE] it returns an array of entries, when no 'format' is passed", () => {
+            it(`[CORRECT TYPE] it returns an array of entries, when 'format === ${format}' is passed`, () => {
               assert.equal(Array.isArray(returnValue), true);
             });
-            it("[CORRECT VALUE] correctly returns an array of entries, when no 'format' is passed", () => {
+            it(`[CORRECT VALUE] correctly returns an array of entries, when 'format === ${format}' is passed`, () => {
               assert.deepEqual(returnValue, [testEntry1, testEntry2]);
+            });
+
+            it(`[CORRECT VALUE][CORRECT TYPE] when 'format === ${format}' and an error occurs it returns an {}`, () => {
+              let returnValue = selectors.getAll({}, format);
+              assert.equal(Array.isArray(returnValue), true);
+              assert.deepEqual(returnValue, []);
             });
           });
         });
@@ -442,14 +474,21 @@ describe("CRUD SELECTORS", () => {
             isFetching: false
           };
           let returnValue = selectors.getAll(state, "map");
-          it("[CORRECT TYPE] it returns an array of entries, when no 'format' is passed", () => {
+          it("[CORRECT TYPE] it returns an array of entries, when 'format === map' is passed", () => {
             assert.equal(
               typeof returnValue === "object" && !Array.isArray(returnValue),
               true
             );
           });
-          it("[CORRECT VALUE] correctly returns an array of entries, when no 'format' is passed", () => {
+          it("[CORRECT VALUE] correctly returns an array of entries, when 'format === map' is passed", () => {
             assert.deepEqual(returnValue, { 111: testEntry1, 222: testEntry2 });
+          });
+
+          it("[CORRECT VALUE][CORRECT TYPE] when 'format === map' and an error occurs it returns an {}", () => {
+            let returnValue = selectors.getAll({}, "map");
+            assert.equal(typeof returnValue, "object");
+            assert.equal(Array.isArray(returnValue), false);
+            assert.deepEqual(returnValue, {});
           });
         });
       });
