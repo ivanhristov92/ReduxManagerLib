@@ -13,38 +13,66 @@ describe("CRUD Action Types", () => {
 
   describe("[MODULE INITIALIZATION SIGNATURE]", () => {
     describe("actionTypesFactory", () => {
-      describe("[EXPECTS] 'modelName' to be a string, 0th argument", () => {
-        it("[ACCEPTS] a string for 'modelName'", () => {
-          assert.doesNotThrow(function() {
-            actionTypesFactory("Some String");
-          }, Error);
-        });
-
-        [null, undefined, 2, true, function() {}, {}, ""].forEach(data => {
-          it(`[THROWS] if 'modelName' is not a string. Throws for ${typeof data}: ${data}`, () => {
-            assert.throws(function() {
-              actionTypesFactory(data);
+      describe("[EXPECTS]", () => {
+        describe("'modelName' to be a string, 0th argument", () => {
+          it("[ACCEPTS] a string for 'modelName'", () => {
+            assert.doesNotThrow(function() {
+              actionTypesFactory("Some String");
             }, Error);
+          });
+
+          [null, undefined, 2, true, function() {}, {}, ""].forEach(data => {
+            it(`[THROWS] if 'modelName' is not a string. Throws for ${typeof data}: ${data}`, () => {
+              assert.throws(function() {
+                actionTypesFactory(data);
+              }, Error);
+            });
+          });
+
+          it("[THROWS] throws a ModuleInitializationTypeError if 'modelName' is not provided", () => {
+            try {
+              actionTypesFactory(null);
+            } catch (err) {
+              assert.equal(err.name, "ModuleInitializationTypeError");
+            }
           });
         });
 
-        it("[THROWS] throws a ModuleInitializationTypeError if 'modelName' is not provided", () => {
-          try {
-            actionTypesFactory(null);
-          } catch (err) {
-            assert.equal(err.name, "ModuleInitializationTypeError");
-          }
+        describe("[1] optional 'options' object", () => {
+          const MODEL_NAME = "SomeModel";
+          it("[ACCEPTS] undefined for 'options'", () => {
+            assert.doesNotThrow(function() {
+              actionTypesFactory(MODEL_NAME, undefined);
+            }, Error);
+          });
+
+          it("[ACCEPTS][CORRECT TYPE] accepts {additional: {TEST: 'TEST'}", () => {
+            assert.doesNotThrow(function() {
+              actionTypesFactory(MODEL_NAME, {
+                additional: { TEST: "TEST" }
+              });
+            });
+          });
+
+          [[], "", "test", function() {}, null, false, true, 100, 0].forEach(
+            (value, index) => {
+              it(`${index} [THROWS] throws a ModuleInitializationTypeError if 'options.additional' is not an object or undefined, but ${typeof value} : ${value}`, () => {
+                try {
+                  actionTypesFactory(MODEL_NAME, {
+                    additional: value
+                  });
+
+                  throw new Error("should have thrown");
+                } catch (err) {
+                  assert.equal(err.name, "ModuleInitializationTypeError");
+                }
+              });
+            }
+          );
         });
       });
 
       describe("[RETURNS]", function() {
-        describe("[CORRECT TYPE] The object returned by the factory function must have an 'extend' method", () => {
-          it("The returned object has an extend method", () => {
-            let actionTypes = actionTypesFactory("SomeModel");
-            assert.equal(typeof actionTypes.extend, "function");
-          });
-        });
-
         describe("[CORRECT TYPE] The factory function must return an object with the action types", () => {
           let actionTypes = actionTypesFactory("SomeModel");
 
@@ -102,56 +130,6 @@ describe("CRUD Action Types", () => {
               }
             );
           });
-        });
-      });
-    });
-
-    describe("'extend'", () => {
-      describe("[EXPECTS] an object", () => {
-        it("[ACCEPTS] an object", () => {
-          assert.doesNotThrow(function() {
-            let actionTypes = actionTypesFactory("SomeModel");
-            actionTypes.extend({});
-          }, Error);
-        });
-
-        [null, undefined, 0, 1, true, false, function() {}, []].forEach(
-          data => {
-            it(`[THROWS ]The 'extend' method THROWS for ${typeof data}: ${data}`, () => {
-              let actionTypes = actionTypesFactory("SomeModel");
-
-              assert.throws(function() {
-                actionTypes.extend(data);
-              }, Error);
-            });
-          }
-        );
-      });
-
-      describe("[RETURNS]", () => {
-        it("[CORRECT TYPE] The 'extend' method returns an object", () => {
-          let actionTypes = actionTypesFactory("SomeModel");
-          let extendedActionTypes = actionTypes.extend({
-            TEST_TYPE: "TEST_TYPE"
-          });
-          assert.equal(typeof extendedActionTypes, "object");
-        });
-
-        it("[CORRECT TYPE] The 'extend' method adds new action types to the object", () => {
-          let actionTypes = actionTypesFactory("SomeModel");
-          let extendedActionTypes = actionTypes.extend({
-            TEST_TYPE: "TEST_TYPE"
-          });
-          assert.equal(_.has("TEST_TYPE", extendedActionTypes), true);
-        });
-      });
-
-      describe("[OPERATION]", () => {
-        it("The 'extend' method does not modify the original object", () => {
-          let actionTypes = actionTypesFactory("SomeModel");
-          let actionTypesBackup = actionTypesFactory("SomeModel");
-          actionTypes.extend({ TEST_TYPE: "TEST_TYPE" });
-          assert.deepEqual(actionTypes, actionTypesBackup);
         });
       });
     });

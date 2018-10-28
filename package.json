@@ -4,7 +4,7 @@
   "description": "",
   "main": "model.js",
   "scripts": {
-    "test": "mocha --require babel-polyfill --require babel-register ./test/**/crud-action-creators.js"
+    "test": "mocha --require babel-polyfill --require babel-register ./test/**/crud-action-types.js"
   },
   "author": "",
   "license": "ISC",
