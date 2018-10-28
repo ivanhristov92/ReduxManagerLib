@@ -1,8 +1,0 @@
-What is ReduxManagerLib?
-ReduxManagerLib is a runtime generator of CRUD-ready data models for Redux.
-
-It creates all of the Redux piping necessary to start working with a given model very quickly. On top of that it provides a piece of mind, because it is predictable and easy to follow, and gives meaningful feedback.
-
-ReduxManagerLib can be used with any Redux app, regardless of the view library of choice.
-
-Check out the wiki for a better introduction and examples: https://github.com/ivanhristov92/ReduxManagerLib/wiki
