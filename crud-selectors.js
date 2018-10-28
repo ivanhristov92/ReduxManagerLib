@@ -62,7 +62,8 @@ export default function selectorsFactory(options) {
     {
       getAll,
       getOne,
-      getSome
+      getSome,
+      getError
     },
     additionalSelectors
   );
