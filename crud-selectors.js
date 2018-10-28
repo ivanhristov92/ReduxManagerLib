@@ -47,6 +47,16 @@ export default function selectorsFactory(options) {
     }
   }
 
+  function getError(state) {
+    try {
+      typeCheckState(state);
+      return state.error;
+    } catch (error) {
+      runtimeErrorHandler(error, { state, ids, format, selector: "getSome" });
+      return {};
+    }
+  }
+
   let additionalSelectors = (options && options.additional) || {};
   return Object.assign(
     {
