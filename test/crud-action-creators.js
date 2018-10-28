@@ -264,22 +264,23 @@ describe("CRUD Action Creators", () => {
             });
           });
 
-          it("[EMITS] emits an UnexpectedRuntimeError error if 'dispatch' is undefined", () => {
+          it("[CALLS] the errorHandler function if 'dispatch' is undefined", () => {
+            let options = {
+              customErrorHandler() {}
+            };
+            sinon.spy(options, "customErrorHandler");
+
             let actionCreators = actionCreatorsFactory(
               mockActionTypes,
-              mockRestApi
-            );
-            // assert.doesNotThrow(function() {
-            let store = { dispatch: undefined };
-            sinon.spy(document, "dispatchEvent");
-            const thunkFunction = actionCreators[crudAct]();
-            thunkFunction(store.dispatch);
-            assert.equal(
-              document.dispatchEvent.getCall(0).args[0].type,
-              "unexpectedruntimeerror"
+              mockRestApi,
+              options
             );
 
-            // });
+            let store = { dispatch: undefined };
+            const thunkFunction = actionCreators[crudAct]();
+            thunkFunction(store.dispatch);
+            const errorHandlerCall = options.customErrorHandler.getCall(0);
+            assert.notEqual(errorHandlerCall, null);
           });
         });
       });

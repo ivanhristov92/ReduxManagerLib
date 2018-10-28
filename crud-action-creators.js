@@ -20,6 +20,7 @@ import { typeCheckExtensions } from "./utils";
 const _thunkFactory = _.curry(function(
   actionTypes,
   restApiInstance,
+  unexpectedRuntimeErrorHandler,
   crudMethod
 ) {
   let actionTypeKey = crudMethod.toUpperCase();
@@ -61,7 +62,7 @@ const _thunkFactory = _.curry(function(
           });
       } catch (error) {
         // emit a global error event
-        dispatchAnUnexpectedErrorEvent(error, {
+        unexpectedRuntimeErrorHandler(error, {
           crudMethod,
           payload,
           actionTyp: actionTypes[actionTypeKey],
@@ -96,12 +97,19 @@ export default function actionCreatorsFactory(
   typeCheckOptions(options);
 
   let runtimeErrorHandler =
-    (options && options.customErrorHandler) || defaultRuntimeErrorHandler;
+    (options && options.customErrorHandler) ||
+    function defaultRuntimeErrorHandler(error, details) {
+      dispatchAnUnexpectedErrorEvent(error, details);
+    };
 
   let actionTypes = _.clone(_actionTypes);
   let restApiInstance = _.clone(_restApiInstance);
 
-  let thunkFactory = _thunkFactory(actionTypes, restApiInstance);
+  let thunkFactory = _thunkFactory(
+    actionTypes,
+    restApiInstance,
+    runtimeErrorHandler
+  );
 
   let actionCreators = {
     create: thunkFactory("create"),
@@ -111,10 +119,6 @@ export default function actionCreatorsFactory(
   };
 
   return Object.assign(actionCreators, options.additional || {});
-}
-
-function defaultRuntimeErrorHandler(error, details) {
-  dispatchAnUnexpectedErrorEvent(error, details);
 }
 
 function typeCheckOptions(options) {
