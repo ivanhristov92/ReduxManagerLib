@@ -70,7 +70,7 @@ export default function selectorsFactory(options) {
 }
 
 function typeCheckState(state) {
-  if (!isObject(state)) {
+  if (!isObject(state) || Object.keys(state).length === 0) {
     throw new TypeError(
       `Expected state to be a valid State object, instead received ${typeof state}: ${"" +
         state}`
@@ -81,11 +81,14 @@ function typeCheckState(state) {
       `Expected state to have a 'byId' property, instead received ${typeof state}: ${state}`
     );
   }
-  if (typeof state.isFetching !== "boolean") {
-    throw new TypeError(
-      `Expected state to have an 'isFetching' property, instead received ${typeof state}: ${state}`
-    );
-  }
+  ["create", "read", "update", "delete"].forEach(operation => {
+      if (typeof state[operation] !== "string") {
+          throw new TypeError(
+              `Expected state to have an '${operation}' property to be a string, instead received ${typeof state}: ${state}`
+          );
+      }
+  })
+
 }
 
 // helpers

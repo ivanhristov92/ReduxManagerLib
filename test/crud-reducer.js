@@ -257,12 +257,15 @@ describe("CRUD Rest Api", () => {
               assert.equal(typeof state, "object");
             });
 
-            it("The initial state should look like: '{byId: {}, isFetching: false, error: null}'", () => {
+            it("The initial state should look like: '{byId: {}, error: null, create: 'IDLE', read: 'IDLE, update: 'IDLE', delete: 'IDLE'}'", () => {
               let state = reducer(undefined, unknownAction);
               assert.deepEqual(state, {
                 byId: {},
-                isFetching: false,
-                error: null
+                error: null,
+                create: "IDLE",
+                read: "IDLE",
+                update: "IDLE",
+                delete: "IDLE"
               });
             });
           });
@@ -278,28 +281,34 @@ describe("CRUD Rest Api", () => {
 
             ["CREATE", "READ", "UPDATE", "DELETE"].forEach(crudAct => {
               describe(crudAct, () => {
-                it(`The reducer should turn ON the isFetching flag on "${crudAct}"`, () => {
+                it(`The reducer should turn ON 'LOADING' flag on "${crudAct}"`, () => {
                   const action = { type: mockActionTypes[crudAct] };
                   let state = reducer(undefined, action);
-                  assert.equal(state.isFetching, true);
+                  assert.equal(state[crudAct.toLowerCase()], "LOADING");
                 });
 
-                it(`The reducer should turn OFF the isFetching flag on "${crudAct}__FAILURE"`, () => {
+                it(`The reducer should turn ON the "FAILURE" flag on "${crudAct}__FAILURE"`, () => {
                   const action = {
                     type: mockActionTypes[`${crudAct}__FAILURE`],
                     error: {}
                   };
-                  let state = reducer({ byId: {}, isFetching: true }, action);
-                  assert.equal(state.isFetching, false);
+                  let state = reducer(
+                    { byId: {}, [crudAct.toLowerCase()]: "LOADING" },
+                    action
+                  );
+                  assert.equal(state[crudAct.toLowerCase()], "FAILURE");
                 });
 
-                it(`The reducer should turn OFF the isFetching flag on "${crudAct}__SUCCESS"`, () => {
+                it(`The reducer should turn ON the "SUCCESS" flag on "${crudAct}__SUCCESS"`, () => {
                   const action = {
                     type: mockActionTypes[`${crudAct}__SUCCESS`],
                     payload: {}
                   };
-                  let state = reducer({ byId: {}, isFetching: true }, action);
-                  assert.equal(state.isFetching, false);
+                  let state = reducer(
+                    { byId: {}, [crudAct.toLowerCase()]: "LOADING" },
+                    action
+                  );
+                  assert.equal(state[crudAct.toLowerCase()], "SUCCESS");
                 });
 
                 if (crudAct === "DELETE") {

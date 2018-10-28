@@ -9,6 +9,12 @@ import { typeCheckOptions, isObject, isOptionalObject } from "./utils";
 /////////////////////////////////////////////////////////////////////
 ////// REDUCER FACTORY //////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
+const STATES = {
+  IDLE: "IDLE",
+  LOADING: "LOADING",
+  SUCCESS: "SUCCESS",
+  FAILURE: "FAILURE"
+};
 
 export default function reducerFactory(actionTypes, options) {
   typeCheckActionTypes(actionTypes);
@@ -20,26 +26,34 @@ export default function reducerFactory(actionTypes, options) {
 
   let does = Object.assign(
     {
-      [actionTypes["CREATE"]]: createReadUpdateDelete,
-      [actionTypes["READ"]]: createReadUpdateDelete,
-      [actionTypes["UPDATE"]]: createReadUpdateDelete,
-      [actionTypes["DELETE"]]: createReadUpdateDelete,
+      [actionTypes["CREATE"]]: createReadUpdateDelete("create"),
+      [actionTypes["READ"]]: createReadUpdateDelete("read"),
+      [actionTypes["UPDATE"]]: createReadUpdateDelete("update"),
+      [actionTypes["DELETE"]]: createReadUpdateDelete("delete"),
 
-      [actionTypes["CREATE__SUCCESS"]]: successfulCreateReadUpdate,
-      [actionTypes["READ__SUCCESS"]]: successfulCreateReadUpdate,
-      [actionTypes["UPDATE__SUCCESS"]]: successfulCreateReadUpdate,
+      [actionTypes["CREATE__SUCCESS"]]: successfulCreateReadUpdate("create"),
+      [actionTypes["READ__SUCCESS"]]: successfulCreateReadUpdate("read"),
+      [actionTypes["UPDATE__SUCCESS"]]: successfulCreateReadUpdate("update"),
       [actionTypes["DELETE__SUCCESS"]]: successfulDelete,
 
-      [actionTypes["CREATE__FAILURE"]]: failedCreateReadUpdateDelete,
-      [actionTypes["READ__FAILURE"]]: failedCreateReadUpdateDelete,
-      [actionTypes["UPDATE__FAILURE"]]: failedCreateReadUpdateDelete,
-      [actionTypes["DELETE__FAILURE"]]: failedCreateReadUpdateDelete
+      [actionTypes["CREATE__FAILURE"]]: failedCreateReadUpdateDelete("create"),
+      [actionTypes["READ__FAILURE"]]: failedCreateReadUpdateDelete("read"),
+      [actionTypes["UPDATE__FAILURE"]]: failedCreateReadUpdateDelete("update"),
+      [actionTypes["DELETE__FAILURE"]]: failedCreateReadUpdateDelete("delete")
     },
     options.additional || {}
   );
 
   function reducer(
-    state = { byId: {}, isFetching: false, error: null },
+    // state = { byId: {}, isFetching: false, error: null },
+    state = {
+      byId: {},
+      error: null,
+      create: STATES.IDLE,
+      read: STATES.IDLE,
+      update: STATES.IDLE,
+      delete: STATES.IDLE
+    },
     action
   ) {
     try {
@@ -64,34 +78,40 @@ export default function reducerFactory(actionTypes, options) {
 ////// COMMON INTERNAL REDUCERS /////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
-function createReadUpdateDelete(state, action) {
-  return {
-    ...state,
-    isFetching: true,
-    error: null
+function createReadUpdateDelete(operation) {
+  return function createReadUpdateDelete(state, action) {
+    return {
+      ...state,
+      [operation]: STATES.LOADING,
+      error: null
+    };
   };
 }
 
-function successfulCreateReadUpdate(state, action) {
-  return {
-    ...state,
-    byId: {
-      ...state.byId,
-      ...action.payload.byId
-    },
-    isFetching: false,
-    error: null
+function successfulCreateReadUpdate(operation) {
+  return function successfulCreateReadUpdate(state, action) {
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        ...action.payload.byId
+      },
+      [operation]: STATES.SUCCESS,
+      error: null
+    };
   };
 }
 
-function failedCreateReadUpdateDelete(state, action) {
-  if (!action.error) {
-    throw new TypeError("failure action needs to have an 'error' attribute");
-  }
-  return {
-    ...state,
-    isFetching: false,
-    error: action.error
+function failedCreateReadUpdateDelete(operation) {
+  return function failedCreateReadUpdateDelete(state, action) {
+    if (!action.error) {
+      throw new TypeError("failure action needs to have an 'error' attribute");
+    }
+    return {
+      ...state,
+      [operation]: STATES.FAILURE,
+      error: action.error
+    };
   };
 }
 
@@ -99,7 +119,7 @@ function successfulDelete(state, action) {
   return {
     ...state,
     byId: _.omit([action.payload.id], state.byId),
-    isFetching: false,
+    delete: STATES.SUCCESS,
     error: null
   };
 }

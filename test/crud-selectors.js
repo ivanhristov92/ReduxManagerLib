@@ -124,9 +124,7 @@ describe("CRUD SELECTORS", () => {
             {},
             { byId: {} },
             { byId: [] },
-            { isFetching: true },
-            { isFetching: "", byId: {} },
-            { isFetching: true, byId: [] },
+            { create: "", read: "" },
             "test",
             []
           ].forEach((value, index) => {
@@ -183,7 +181,7 @@ describe("CRUD SELECTORS", () => {
               sinon.spy(options, "customErrorHandler");
               assert.doesNotThrow(function() {
                 selectorsFactory().getOne(
-                  { byId: {}, isFetching: false },
+                  { byId: {}, create: "", read: "", update: "", delete: "" },
                   "non-empty"
                 );
               });
@@ -194,7 +192,10 @@ describe("CRUD SELECTORS", () => {
               let options = { customErrorHandler() {} };
               sinon.spy(options, "customErrorHandler");
               assert.doesNotThrow(function() {
-                selectorsFactory().getOne({ byId: {}, isFetching: false }, 22);
+                selectorsFactory().getOne(
+                  { byId: {}, create: "", read: "", update: "", delete: "" },
+                  22
+                );
               });
               const errorHandlerCall = options.customErrorHandler.getCall(0);
               assert.equal(errorHandlerCall, null);
@@ -233,7 +234,13 @@ describe("CRUD SELECTORS", () => {
         it("[CORRECT VALUE] it returns the selected entry by a string id", () => {
           let selectors = selectorsFactory({ customErrorHandler() {} });
           let testEntry = { id: "test" };
-          let state = { byId: { test: testEntry }, isFetching: false };
+          let state = {
+            byId: { test: testEntry },
+            create: "",
+            read: "",
+            update: "",
+            delete: ""
+          };
           let id = "test";
           let returnValue = selectors.getOne(state, id);
           assert.deepEqual(returnValue, testEntry);
@@ -242,7 +249,13 @@ describe("CRUD SELECTORS", () => {
         it("[CORRECT VALUE] it returns the selected entry by a number id", () => {
           let selectors = selectorsFactory({ customErrorHandler() {} });
           let testEntry = { id: 222 };
-          let state = { byId: { 222: testEntry }, isFetching: false };
+          let state = {
+            byId: { 222: testEntry },
+            create: "",
+            read: "",
+            update: "",
+            delete: ""
+          };
           let id = 222;
           let returnValue = selectors.getOne(state, id);
           assert.deepEqual(returnValue, testEntry);
@@ -272,7 +285,13 @@ describe("CRUD SELECTORS", () => {
               sinon.spy(options, "customErrorHandler");
               assert.doesNotThrow(function() {
                 selectorsFactory(options).getSome(
-                  { byId: {}, isFetching: false },
+                  {
+                    byId: {},
+                    create: "",
+                    read: "",
+                    update: "",
+                    delete: ""
+                  },
                   [1, "non empty"]
                 );
               });
@@ -318,7 +337,13 @@ describe("CRUD SELECTORS", () => {
                 sinon.spy(options, "customErrorHandler");
                 assert.doesNotThrow(function() {
                   selectorsFactory(options).getSome(
-                    { byId: {}, isFetching: false },
+                    {
+                      byId: {},
+                      create: "",
+                      read: "",
+                      update: "",
+                      delete: ""
+                    },
                     ["non-empty id"],
                     format
                   );
@@ -367,7 +392,10 @@ describe("CRUD SELECTORS", () => {
             let testEntry2 = { id: 222 };
             let state = {
               byId: { 111: testEntry1, 222: testEntry2 },
-              isFetching: false
+              create: "",
+              read: "",
+              update: "",
+              delete: ""
             };
             let ids = [111, 222];
             let returnValue = selectors.getSome(state, ids, format);
@@ -392,7 +420,10 @@ describe("CRUD SELECTORS", () => {
           let testEntry2 = { id: 222 };
           let state = {
             byId: { 111: testEntry1, 222: testEntry2 },
-            isFetching: false
+            create: "",
+            read: "",
+            update: "",
+            delete: ""
           };
           let ids = [111, 222];
           let returnValue = selectors.getSome(state, ids, "map");
@@ -427,7 +458,13 @@ describe("CRUD SELECTORS", () => {
                 sinon.spy(options, "customErrorHandler");
                 assert.doesNotThrow(function() {
                   selectorsFactory(options).getAll(
-                    { byId: {}, isFetching: false },
+                    {
+                      byId: {},
+                      create: "",
+                      read: "",
+                      update: "",
+                      delete: ""
+                    },
                     format
                   );
                 });
@@ -474,7 +511,10 @@ describe("CRUD SELECTORS", () => {
             let testEntry2 = { id: 222 };
             let state = {
               byId: { 111: testEntry1, 222: testEntry2 },
-              isFetching: false
+              create: "",
+              read: "",
+              update: "",
+              delete: ""
             };
             let returnValue = selectors.getAll(state, format);
             it(`[CORRECT TYPE] it returns an array of entries, when 'format === ${format}' is passed`, () => {
@@ -498,7 +538,10 @@ describe("CRUD SELECTORS", () => {
           let testEntry2 = { id: 222 };
           let state = {
             byId: { 111: testEntry1, 222: testEntry2 },
-            isFetching: false
+            create: "",
+            read: "",
+            update: "",
+            delete: ""
           };
           let returnValue = selectors.getAll(state, "map");
           it("[CORRECT TYPE] it returns an array of entries, when 'format === map' is passed", () => {
