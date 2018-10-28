@@ -11,6 +11,7 @@ import {
 export default function reducerFactory(actionTypes, options) {
   typeCheckActionTypes(actionTypes);
   typeCheckOptions(options);
+  options = options || {};
 
   let runtimeErrorHandler =
     (options && options.customErrorHandler) || defaultRuntimeErrorHandler;
@@ -32,7 +33,7 @@ export default function reducerFactory(actionTypes, options) {
       [actionTypes["UPDATE__FAILURE"]]: failedCreateReadUpdateDelete,
       [actionTypes["DELETE__FAILURE"]]: failedCreateReadUpdateDelete
     },
-    (options && options.additionalActions) || {}
+    options.additional || {}
   );
 
   function reducer(
@@ -145,37 +146,37 @@ function typeCheckActionTypes(actionTypes) {
     });
 }
 
-function typeCheckOptions(options) {
-  if (!isOptionalObject(options)) {
-    throw new ModuleInitializationTypeError(
-      "'options' must be an object or undefined. Instead received: " +
-        JSON.stringify(options)
-    );
-  }
-  typeCheckAdditionalActions((options || {}).additionalActions);
-  typeCheckCustomErrorHandler((options || {}).customErrorHandler);
-}
-
-function typeCheckCustomErrorHandler(customErrorHandler) {
-  if (
-    typeof customErrorHandler !== "undefined" &&
-    typeof customErrorHandler !== "function"
-  ) {
-    throw new ModuleInitializationTypeError(
-      "setRuntimeErrorHandler expects a function, instead it received " +
-        typeof customErrorHandler
-    );
-  }
-}
-
-function typeCheckAdditionalActions(additionalActions) {
-  if (!isOptionalObject(additionalActions)) {
-    throw new ModuleInitializationTypeError(
-      "'additionalActions' must be an object or undefined. Instead received: " +
-        JSON.stringify(additionalActions)
-    );
-  }
-}
+// function typeCheckOptions(options) {
+//   if (!isOptionalObject(options)) {
+//     throw new ModuleInitializationTypeError(
+//       "'options' must be an object or undefined. Instead received: " +
+//         JSON.stringify(options)
+//     );
+//   }
+//   typeCheckAdditionalActions((options || {}).additionalActions);
+//   typeCheckCustomErrorHandler((options || {}).customErrorHandler);
+// }
+//
+// function typeCheckCustomErrorHandler(customErrorHandler) {
+//   if (
+//     typeof customErrorHandler !== "undefined" &&
+//     typeof customErrorHandler !== "function"
+//   ) {
+//     throw new ModuleInitializationTypeError(
+//       "setRuntimeErrorHandler expects a function, instead it received " +
+//         typeof customErrorHandler
+//     );
+//   }
+// }
+//
+// function typeCheckAdditionalActions(additionalActions) {
+//   if (!isOptionalObject(additionalActions)) {
+//     throw new ModuleInitializationTypeError(
+//       "'additionalActions' must be an object or undefined. Instead received: " +
+//         JSON.stringify(additionalActions)
+//     );
+//   }
+// }
 
 // [RUNTIME]
 function typeCheckState(state) {
@@ -192,6 +193,52 @@ function typeCheckAction(action) {
   }
 }
 
+// // helpers
+// function isObject(value) {
+//   return typeof value === "object" && !Array.isArray(value) && value;
+// }
+//
+// function isOptionalObject(value) {
+//   return typeof value === "undefined" || isObject(value);
+// }
+//
+
+/////////////////////////////////////////////
+
+function typeCheckOptions(options) {
+  if (!isOptionalObject(options)) {
+    throw new ModuleInitializationTypeError(
+      `Expected an object or undefined, instead received ${typeof options}: ${options}`
+    );
+  }
+
+  if (isObject(options) && !isOptionalFunction(options.customErrorHandler)) {
+    throw new ModuleInitializationTypeError(
+      `Expected an 'customErrorHandler' to be a function, instead received ${typeof options.customErrorHandler}: ${
+        options.customErrorHandler
+      }`
+    );
+  }
+
+  if (isObject(options)) {
+    if (!isOptionalObject(options.additional)) {
+      throw new ModuleInitializationTypeError(
+        `Expected 'options.additional' to be an object, instead received ${typeof options.additional}: ${
+          options.additional
+        }`
+      );
+    } else {
+      Object.values(options.additional || {}).forEach(value => {
+        if (typeof value !== "function") {
+          throw new ModuleInitializationTypeError(
+            `Expected 'options.additional' to be an object containing functions, instead received  ${typeof value}: ${value}`
+          );
+        }
+      });
+    }
+  }
+}
+
 // helpers
 function isObject(value) {
   return typeof value === "object" && !Array.isArray(value) && value;
@@ -199,4 +246,8 @@ function isObject(value) {
 
 function isOptionalObject(value) {
   return typeof value === "undefined" || isObject(value);
+}
+
+function isOptionalFunction(func) {
+  return typeof func === "undefined" || typeof func === "function";
 }

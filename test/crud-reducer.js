@@ -98,17 +98,17 @@ describe("CRUD Rest Api", () => {
             );
           });
         });
-        describe("options.additionalActions", () => {
+        describe("options.additional", () => {
           [1, " ", true, null, [], function() {}].forEach(data => {
             it(
-              "[THROWS] throws a 'ModuleInitializationTypeError' if options.additionalActions is not an object or undefined " +
+              "[THROWS] throws a 'ModuleInitializationTypeError' if options.additional is not an object or undefined " +
                 typeof data +
                 ": " +
                 data,
               () => {
                 const { mockActionTypes } = createMocks();
                 try {
-                  reducerFactory(mockActionTypes, { additionalActions: data });
+                  reducerFactory(mockActionTypes, { additional: data });
                   throw new Error("Should have thrown");
                 } catch (err) {
                   assert.equal(err.name, "ModuleInitializationTypeError");
@@ -123,6 +123,24 @@ describe("CRUD Rest Api", () => {
         it("[CORRECT TYPE] The factory function must return a function", () => {
           const { mockActionTypes } = createMocks();
           assert.equal(typeof reducerFactory(mockActionTypes), "function");
+        });
+        it("[CORRECT VALUE] The factory function must return a function, that has the added extensions", () => {
+          const { mockActionTypes } = createMocks();
+          const reducer = reducerFactory(mockActionTypes, {
+            additional: {
+              TEST_ME(state, action) {
+                return {
+                  ...state,
+                  tested: true
+                };
+              }
+            }
+          });
+          let changedState = reducer(
+            { byId: {}, isFetching: false, tested: false },
+            { type: "TEST_ME" }
+          );
+          assert.equal(changedState.tested, true);
         });
       });
     });
@@ -329,7 +347,7 @@ describe("CRUD Rest Api", () => {
           const createAction = { type: mockActionTypes.CREATE, payload: {} };
           mockActionTypes["CREATE"] = `NOT_CREATE`;
           const stateAfterAction = reducer(initialState, createAction);
-          assert.deepEqual(initialState, stateAfterAction);
+          assert.notDeepEqual(initialState, stateAfterAction);
         });
 
         it("the correct action type affects the state", () => {
@@ -354,11 +372,11 @@ describe("CRUD Rest Api", () => {
             reducer = reducerFactory(mockActionTypes, options);
           });
 
-          it("passes 3 arguments", () => {
+          it("passes 2 arguments", () => {
             reducer(undefined, null);
             const errorHandlerCall = options.customErrorHandler.getCall(0);
             const args = errorHandlerCall.args;
-            assert.equal(args.length, 3);
+            assert.equal(args.length, 2);
           });
 
           it("1st argument is the error", () => {
@@ -368,20 +386,13 @@ describe("CRUD Rest Api", () => {
             assert.equal(firstArg instanceof Error, true);
           });
 
-          it("2nd argument is the state", () => {
+          it("2nd argument is the details object", () => {
             let state = { testState: true };
             reducer(state, null);
             const errorHandlerCall = options.customErrorHandler.getCall(0);
             const secondArg = errorHandlerCall.args[1];
-            assert.deepEqual(secondArg, state);
-          });
-
-          it("3rd argument is the action", () => {
-            let badAction = { testState: true };
-            reducer(undefined, badAction);
-            const errorHandlerCall = options.customErrorHandler.getCall(0);
-            const thirdArg = errorHandlerCall.args[2];
-            assert.deepEqual(thirdArg, badAction);
+            assert.equal(typeof secondArg, "object");
+            assert.notEqual(Array.isArray(secondArg), true);
           });
         });
       });
