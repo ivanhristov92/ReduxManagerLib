@@ -17,5 +17,5 @@ _ReduxManagerLib can be used with any Redux app, regardless of the view library 
 Check out this introductory wiki for more details and examples: 
 https://github.com/ivanhristov92/ReduxManagerLib/wiki/Introduction
 
-Or go and see a more thorough demo at this repo: 
+Or go and see a more thorough example at this repo:
 https://github.com/ivanhristov92/ReduxManagerLibDemos
