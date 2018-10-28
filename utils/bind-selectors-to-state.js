@@ -1,35 +1,4 @@
-import { ModuleInitializationTypeError } from "./crud-error-types";
-
-function extend(additionalProperties) {
-  if (
-    typeof additionalProperties !== "object" ||
-    Array.isArray(additionalProperties) ||
-    additionalProperties === null
-  ) {
-    throw new TypeError(
-      "Expected and object, but received " + typeof additionalProperties
-    );
-  }
-
-  return Object.assign(Object.create(this), additionalProperties);
-}
-
-export function addExtendFunctionality(objectToExtend) {
-  return Object.assign(Object.create({ extend }), objectToExtend);
-}
-
-export function typeCheckExtensions(additionalProperties) {
-  if (
-    typeof additionalProperties !== "object" ||
-    Array.isArray(additionalProperties) ||
-    additionalProperties === null
-  ) {
-    throw new TypeError(
-      "Expected and object, but received " + typeof additionalProperties
-    );
-  }
-}
-
+import { ModuleInitializationTypeError } from "../crud-error-types";
 import * as _ from "ramda";
 
 export function bindSelectorsToState(subStateGetter, selectors) {

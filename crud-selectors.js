@@ -1,17 +1,10 @@
-import {
-  dispatchAnUnexpectedErrorEvent,
-  ModuleInitializationTypeError
-} from "./crud-error-types";
+import { typeCheckOptions, defaultRuntimeErrorHandler } from "./utils";
 
 export default function selectorsFactory(options) {
   typeCheckOptions(options);
 
   let runtimeErrorHandler =
     (options && options.customErrorHandler) || defaultRuntimeErrorHandler;
-
-  function defaultRuntimeErrorHandler(error, { state, action }) {
-    dispatchAnUnexpectedErrorEvent(error, { state, action });
-  }
 
   function getAll(state, format) {
     try {
@@ -65,40 +58,6 @@ export default function selectorsFactory(options) {
   );
 }
 
-function typeCheckOptions(options) {
-  if (!isOptionalObject(options)) {
-    throw new ModuleInitializationTypeError(
-      `Expected an object or undefined, instead received ${typeof options}: ${options}`
-    );
-  }
-
-  if (isObject(options) && !isOptionalFunction(options.customErrorHandler)) {
-    throw new ModuleInitializationTypeError(
-      `Expected an 'customErrorHandler' to be a function, instead received ${typeof options.customErrorHandler}: ${
-        options.customErrorHandler
-      }`
-    );
-  }
-
-  if (isObject(options)) {
-    if (!isOptionalObject(options.additional)) {
-      throw new ModuleInitializationTypeError(
-        `Expected 'options.additional' to be an object, instead received ${typeof options.additional}: ${
-          options.additional
-        }`
-      );
-    } else {
-      Object.values(options.additional || {}).forEach(value => {
-        if (typeof value !== "function") {
-          throw new ModuleInitializationTypeError(
-            `Expected 'options.additional' to be an object containing functions, instead received  ${typeof value}: ${value}`
-          );
-        }
-      });
-    }
-  }
-}
-
 function typeCheckState(state) {
   if (!isObject(state)) {
     throw new TypeError(
@@ -121,14 +80,6 @@ function typeCheckState(state) {
 // helpers
 function isObject(value) {
   return typeof value === "object" && !Array.isArray(value) && value;
-}
-
-function isOptionalObject(value) {
-  return typeof value === "undefined" || isObject(value);
-}
-
-function isOptionalFunction(func) {
-  return typeof func === "undefined" || typeof func === "function";
 }
 
 function typeCheckIds(ids) {
