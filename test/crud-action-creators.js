@@ -71,6 +71,60 @@ describe("CRUD Action Creators", () => {
         });
       });
 
+      describe("[EXPECTS] 'options' object is optional", () => {
+        it("[ACCEPTS] undefined for 'options'", () => {
+          assert.doesNotThrow(function() {
+            actionCreatorsFactory(mockActionTypes, mockRestApi);
+          }, Error);
+        });
+
+        it("[ACCEPTS][CORRECT TYPE] accepts {additional: {testMe(){}}}", () => {
+          assert.doesNotThrow(function() {
+            actionCreatorsFactory(mockActionTypes, mockRestApi, {
+              additional: { testMe() {} }
+            });
+          });
+        });
+
+        it("[ACCEPTS][CORRECT TYPE] accepts {additional: {testMe:function(){}}, customErrorHandler: function(){}}", () => {
+          assert.doesNotThrow(function() {
+            actionCreatorsFactory(mockActionTypes, mockRestApi, {
+              additional: { testMe: function() {} },
+              customErrorHandler() {}
+            });
+          });
+        });
+
+        [[], "", "test", function() {}, null, false, true, 100, 0].forEach(
+          (value, index) => {
+            it(`${index} [THROWS] throws a ModuleInitializationTypeError if 'options.additional' is not an object or undefined, but ${typeof value} : ${value}`, () => {
+              try {
+                actionCreatorsFactory(mockActionTypes, mockRestApi, {
+                  additional: value
+                });
+                throw new Error("should have thrown");
+              } catch (err) {
+                assert.equal(err.name, "ModuleInitializationTypeError");
+              }
+            });
+          }
+        );
+        [[], "", "test", null, false, true, 100, 0, {}].forEach(
+          (value, index) => {
+            it(`${index} [THROWS] throws a ModuleInitializationTypeError if 'options.customErrorHandler' is not a function or undefined, but ${typeof value} : ${value}`, () => {
+              try {
+                actionCreatorsFactory(mockActionTypes, mockRestApi, {
+                  customErrorHandler: value
+                });
+                throw new Error("should have thrown");
+              } catch (err) {
+                assert.equal(err.name, "ModuleInitializationTypeError");
+              }
+            });
+          }
+        );
+      });
+
       describe("[RETURNS] the factory function returns:", () => {
         describe("[CORRECT TYPE] The factory function must return an object with the action creators", () => {
           let actionCreators;
@@ -102,66 +156,21 @@ describe("CRUD Action Creators", () => {
           });
         });
 
-        describe("[CORRECT TYPE] - Contains an extend method", () => {
-          it("The returned object has an extend method", () => {
+        describe("[CORRECT TYPE] - contains the additional actions", () => {
+          it("The returned object contains the additional actions", () => {
             let actionCreators = actionCreatorsFactory(
               mockActionTypes,
-              mockRestApi
+              mockRestApi,
+              {
+                additional: {
+                  testMe() {},
+                  testMe2() {}
+                }
+              }
             );
 
-            assert.equal(typeof actionCreators.extend, "function");
-          });
-        });
-      });
-    });
-
-    describe("'extend' method", function() {
-      let actionCreators;
-      beforeEach(function() {
-        actionCreators = actionCreatorsFactory(mockActionTypes, mockRestApi);
-      });
-
-      describe("[EXPECTS] 'extend' only accepts objects", () => {
-        [1, undefined, " ", true, null, []].forEach(value => {
-          it(
-            "[THROWS] throws if it is provided a " +
-              typeof value +
-              ": " +
-              value,
-            () => {
-              assert.throws(function() {
-                actionCreators.extend(value);
-              });
-            }
-          );
-        });
-      });
-
-      describe("[RETURNS]", () => {
-        describe("[CORRECT TYPE] The 'extend' method must return a new object with the added action creators", () => {
-          it("The 'extend' method returns an object", () => {
-            let extendedActionCreators = actionCreators.extend({});
-            assert.equal(typeof extendedActionCreators, "object");
-          });
-
-          it("The 'extend' method adds new action creators to the object", () => {
-            let extendedActionCreators = actionCreators.extend({
-              testAction() {}
-            });
-            assert.equal(_.has("testAction", extendedActionCreators), true);
-          });
-
-          it("The 'extend' method does not modify the original object", () => {
-            let actionCreatorsBackup = actionCreatorsFactory(
-              mockActionTypes,
-              mockRestApi
-            );
-
-            actionCreators.extend({ testAction() {} });
-            assert.deepEqual(
-              _.keys(actionCreators),
-              _.keys(actionCreatorsBackup)
-            );
+            assert.equal(typeof actionCreators.testMe, "function");
+            assert.equal(typeof actionCreators.testMe2, "function");
           });
         });
       });
