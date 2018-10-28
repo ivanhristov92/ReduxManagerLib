@@ -5,4 +5,4 @@ It creates all of the Redux piping necessary to start working with a given model
 
 ReduxManagerLib can be used with any Redux app, regardless of the view library of choice.
 
-Check out the wiki for a better introduction and examples: https://github.com/ivanhristov92/ReduxManagerLib/wiki/Introduction
+Check out the wiki for a better introduction and examples: https://github.com/ivanhristov92/ReduxManagerLib/wiki
