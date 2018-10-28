@@ -45,7 +45,10 @@ const _thunkFactory = _.curry(function(
     return function _thunk_(dispatch) {
       try {
         dispatch({ type: actionTypes[actionTypeKey], payload });
-        return restApiInstance[crudMethod](payload)
+
+        let promise = restApiInstance[crudMethod](payload);
+        typeCheckPromise(promise);
+        return promise
           .then(response => {
             dispatch({
               type: actionTypes[actionTypeSuccessKey],
@@ -114,4 +117,12 @@ export default function actionCreatorsFactory(
   };
 
   return Object.assign(actionCreators, options.additional || {});
+}
+
+function typeCheckPromise(promise) {
+  if (typeof promise !== "object" || typeof promise.then !== "function") {
+    throw new TypeError(
+      `Expected a promise, but instead received ${typeof promise} : ${promise}. Check if your rest api function returns a promise.`
+    );
+  }
 }
