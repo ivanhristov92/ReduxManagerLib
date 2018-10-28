@@ -52,7 +52,25 @@ export default function selectorsFactory(options) {
       typeCheckState(state);
       return state.error;
     } catch (error) {
-      runtimeErrorHandler(error, { state, ids, format, selector: "getSome" });
+      runtimeErrorHandler(error, { state, selector: "getSome" });
+      return {};
+    }
+  }
+
+  function getOperationStates(state) {
+    try {
+      typeCheckState(state);
+      return {
+        create: state.create,
+        read: state.read,
+        update: state.update,
+        delete: state.delete
+      };
+    } catch (error) {
+      runtimeErrorHandler(error, {
+        state,
+        selector: "getOperationStates"
+      });
       return {};
     }
   }
@@ -63,7 +81,8 @@ export default function selectorsFactory(options) {
       getAll,
       getOne,
       getSome,
-      getError
+      getError,
+      getOperationStates
     },
     additionalSelectors
   );
@@ -82,13 +101,12 @@ function typeCheckState(state) {
     );
   }
   ["create", "read", "update", "delete"].forEach(operation => {
-      if (typeof state[operation] !== "string") {
-          throw new TypeError(
-              `Expected state to have an '${operation}' property to be a string, instead received ${typeof state}: ${state}`
-          );
-      }
-  })
-
+    if (typeof state[operation] !== "string") {
+      throw new TypeError(
+        `Expected state to have an '${operation}' property to be a string, instead received ${typeof state}: ${state}`
+      );
+    }
+  });
 }
 
 // helpers

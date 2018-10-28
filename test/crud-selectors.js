@@ -90,7 +90,13 @@ describe("CRUD SELECTORS", () => {
           assert.notEqual(selectorsFactory(), null);
         });
 
-        ["getOne", "getSome", "getAll"].forEach(method => {
+        [
+          "getOne",
+          "getSome",
+          "getAll",
+          "getError",
+          "getOperationStates"
+        ].forEach(method => {
           it(`[CORRECT TYPE] has a ${method} function`, () => {
             assert.equal(typeof selectorsFactory()[method], "function");
           });
@@ -560,6 +566,58 @@ describe("CRUD SELECTORS", () => {
             assert.equal(Array.isArray(returnValue), false);
             assert.deepEqual(returnValue, {});
           });
+        });
+      });
+    });
+
+    describe("getError", () => {
+      describe("[EXPECTS]", () => {
+        testStateArgument("getError");
+      });
+
+      describe("[RETURNS]", () => {
+        let selectors = selectorsFactory({ customErrorHandler() {} });
+        let state = {
+          byId: {},
+          create: "",
+          read: "",
+          update: "",
+          delete: "",
+          error: { test: true }
+        };
+        let returnValue = selectors.getError(state);
+        it("[CORRECT TYPE] returns the value of the error prop", () => {
+          assert.deepEqual({ test: true }, returnValue);
+        });
+      });
+    });
+
+    describe("getOperationStates", () => {
+      describe("[EXPECTS]", () => {
+        testStateArgument("getOperationStates");
+      });
+
+      describe("[RETURNS]", () => {
+        let selectors = selectorsFactory({ customErrorHandler() {} });
+        let state = {
+          byId: {},
+          create: "",
+          read: "",
+          update: "",
+          delete: ""
+        };
+        let returnValue = selectors.getOperationStates(state);
+        it("[CORRECT TYPE] returns an object", () => {
+          assert.equal(
+            typeof returnValue === "object" && !Array.isArray(returnValue),
+            true
+          );
+        });
+        it("[CORRECT VALUE] the object contains 'create', 'read', 'update', 'delete' properties with string values", () => {
+          assert.equal(typeof returnValue.create, "string");
+          assert.equal(typeof returnValue.read, "string");
+          assert.equal(typeof returnValue.update, "string");
+          assert.equal(typeof returnValue.delete, "string");
         });
       });
     });
