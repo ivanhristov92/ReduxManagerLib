@@ -19,6 +19,7 @@ const STATES = {
 export default function reducerFactory(actionTypes, options) {
   typeCheckActionTypes(actionTypes);
   typeCheckOptions(options);
+  typeCheckDefaultState(options);
   options = options || {};
 
   let runtimeErrorHandler =
@@ -44,6 +45,7 @@ export default function reducerFactory(actionTypes, options) {
     options.additional || {}
   );
 
+  const additioonalDefaultState = options ? options.defaultState || {} : {};
   function reducer(
     // state = { byId: {}, isFetching: false, error: null },
     state = {
@@ -52,7 +54,8 @@ export default function reducerFactory(actionTypes, options) {
       create: STATES.IDLE,
       read: STATES.IDLE,
       update: STATES.IDLE,
-      delete: STATES.IDLE
+      delete: STATES.IDLE,
+      ...additioonalDefaultState
     },
     action
   ) {
@@ -180,5 +183,17 @@ function typeCheckState(state) {
 function typeCheckAction(action) {
   if (!isObject(action) || !action.type) {
     throw new TypeError("'not a valid action'");
+  }
+}
+
+function typeCheckDefaultState(options) {
+  if (isObject(options) && options.hasOwnProperty("defaultState")) {
+    if (!isObject(options.defaultState)) {
+      throw new TypeError(
+        `Expected options.defaultState to be an object, instead received: ${typeof options.defaultState}: ${
+          options.defaultState
+        }`
+      );
+    }
   }
 }
