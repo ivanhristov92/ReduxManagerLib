@@ -1,10 +1,10 @@
 {
   "name": "redux-manager-lib",
-  "version": "1.0.1-9",
+  "version": "1.0.1-10",
   "description": "",
   "main": "model.js",
   "scripts": {
-    "test": "mocha --require babel-polyfill --require babel-register ./test/**/crud-selectors.js"
+    "test": "mocha --require babel-polyfill --require babel-register ./test/**/crud-reducer.js"
   },
   "author": "",
   "license": "ISC",
