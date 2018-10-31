@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ReduxManagerLib Documentation</title>
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <!-- FontAwesome JS -->
+    <script defer src="https://use.fontawesome.com/releases/v5.1.1/js/all.js" integrity="sha384-BtvRZcyfv4r0x/phJt9Y9HhnN5ur1Z+kZbKVgzVBAlQZX4jvAuImlIz+bG7TS00a" crossorigin="anonymous"></script>
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
+    <!-- Plugins CSS -->
+    <link rel="stylesheet" href="assets/plugins/prism/prism.css">
+    <link rel="stylesheet" href="assets/plugins/elegant_font/css/style.css">
+
+    <!-- Theme CSS -->
+    <link id="theme-style" rel="stylesheet" href="assets/css/styles.css">
+
+</head>
+
+<body class="body-green">
+<div class="page-wrapper">
+    <!-- ******Header****** -->
+    <header id="header" class="header">
+        <div class="container">
+            <div class="branding">
+                <h1 class="logo">
+                    <a href="index.html">
+                        <span aria-hidden="true" class="icon_documents_alt icon"></span>
+                        <span class="text-highlight">Redux Manager Lib</span> <span class="text-bold">Documentation</span>
+                    </a>
+                </h1>
+            </div><!--//branding-->
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            </ol>
+        </div><!--//container-->
+    </header><!--//header-->
+    <div class="doc-wrapper">
+        <div class="container">
+            <div id="doc-header" class="doc-header text-center">
+                <h1 class="doc-title"><i class="icon fa fa-paper-plane"></i> Core Concepts</h1>
+                <div class="meta"><i class="far fa-clock"></i> Last updated: Oct 30th, 2018</div>
+            </div><!--//doc-header-->
+
+            <div class="doc-body row">
+                <div class="doc-content col-md-9 col-12 order-1">
+                    <div class="content-inner">
+
+                        <section class="doc-section">
+                            <h2 class="section-title">Core Concepts</h2>
+                            <div class="section-block">
+                                <div class="row">
+                                    <div class="col-md-12 col-12">
+                                        <p><strong>Models</strong>, or data models, in many cases represent a single table in a database, although not necessarily. The backend of an app often provides such models as Users, Blog Posts, Categories, Events, etc. The user can query all Blog Posts, or query just one - they can perform create, read, update and delete (CRUD) operations on those models. ReduxManagerLib provides a run-time generated mechanism for that.</p>
+
+                                        <p>Keeping track of the data related to a model is done by redux, via reducers, actions, selectors, etc. To add predictability to these components a set of <strong>conventions</strong> is utilized, whose goal is also to keep each component as lean as possible. Conventions make abstractions possible, which in turn create consistency. These conventions and their associated redux components are called "layers" or "modules" throught ReduxManagerLib.</p>
+
+                                        <h2>Data Shape</h2>
+
+                                        <p>ReduxManagerLib assumes that you are keeping your <a href="https://redux.js.org/recipes/structuringreducers/normalizingstateshape" rel="nofollow">data normalized</a>.
+                                            Without normalization of the data</p>
+
+                                        <ol>
+                                            <li>the <a href="https://redux.js.org/recipes/computingderiveddata" rel="nofollow">selectors</a> need to be custom made. <a href="https://hackernoon.com/selectors-in-redux-are-a-must-d6b0637c79b7" rel="nofollow">Read more.</a>
+                                            </li>
+                                            <li>the reducers too – for each model, as we will not know the structure of the data beforehand.</li>
+                                        </ol>
+
+                                        <h3>Rest Calls</h3>
+
+                                        <p>Rest calls are usually executed from <a href="https://github.com/reduxjs/redux-thunk">thunks</a>, <a href="https://github.com/redux-saga/redux-saga">sagas</a>, <a href="https://redux-observable.js.org/" rel="nofollow">epics (redux-observable)</a> or <a href="https://www.npmjs.com/package/redux-promise-middleware" rel="nofollow">promises inside actions</a> - mechanisms that allow asynchronous execution and isolate <a href="https://en.wikipedia.org/wiki/Side_effect_(computer_science)" rel="nofollow">side effects</a>, leaving the rest of the application relatively <a href="https://en.wikipedia.org/wiki/Pure_function" rel="nofollow">pure</a>.
+                                            That being said, rest calls often involve data transformation as per the needs of the application, such as deserialization, renaming/omitting properties, normalization, etc. This is why, by executing all of these operations withing the Rest Api Layer, a lot of burden falls off of the rest of the application, making it leaner and simpler.</p>
+
+                                        <h2>Naming</h2>
+
+                                        <p>Any naming convention will do, as long as it is kept consistent, and ideally, intuitive for as many developers as possible. The following are implemented in ReduxManagerLib:</p>
+
+                                        <ol>
+                                            <li>
+                                                <p>models – any non-empty string (“ModelName”), preferably in <a href="https://en.wiktionary.org/wiki/Pascal_case" rel="nofollow">pascal case</a></p>
+                                            </li>
+                                            <li>
+                                                <p>action types – ModelName/SOME_ACTION__STATE
+                                                    Start with the model name, followed by a forward slash and then the actual action. The "actual action" is in capital letters, words are separated with underscores, and states ("SUCCESS" or "FAILURE") are attached in the end, preceded by a double underscore.</p>
+                                            </li>
+                                            <li>
+                                                <p>action creators – MyModel.create()
+                                                    Action creators are named as foolows: create, read, update, delete</p>
+                                            </li>
+                                            <li>
+                                                <p>selectors – all selectors begin with “get” and the size of the selection is denoted with "one", "some" or "all". They are all in <a href="https://en.wikipedia.org/wiki/Camel_case" rel="nofollow">camel case</a>.</p>
+                                            </li>
+                                        </ol>
+
+                                        <h2>Actions</h2>
+
+                                        <p>The structure of actions used by default in ReduxManagerLib is inspired by the <a href="https://github.com/redux-utilities/flux-standard-action">standard flux action</a>. It includes 'type', 'payload' and 'error' as properties. 'meta' is considered for future addition. In contrast with the 'standard flux action', the ones that have an 'error' property actually carry the error, rather than a boolean flag.</p>
+
+                                        <h2>Error Handling</h2>
+
+                                        <p><strong>Custom error types</strong> - There are types of errors. Errors occurring during module initialization, and errors occurring during operation, later. Errors occurring during module initialization are not handled, they are thrown to help the developer correct their mistakes. They are instances of ModuleInitializationError.</p>
+                                        <p>Errors which take place during the operation of the module are caught and emitted globally. They don't crash the app and provide meaningful messages and details for the developer to find the error efficiently (UnexpectedRuntimeError).</p>
+                                        <p><strong>400/500-ish responses</strong> from the server are only rejected promises.</p>
+                                        <p><strong>Reducer errors</strong> - errors inside the reducer return the last state, plus an error property, that keeps the error. In addition, by default, the error is emitted globally.</p>
+                                        <p><strong>Selector errors</strong> - run-time errors inside selectors get caught and emitted globally. A default value is returned.</p>
+                                        <p><em>All modules/layers are configurable in terms of error handling, a custom handler can be passed during initialization time.</em></p>
+                                    </div>
+
+                                    <div class="col-md-12 col-12 col-lg-12">
+                                        <div class="custom-nav-wrapper">
+                                            <a class="link custom-nav" href="introduction-technical-goals.html">
+                                                <i class="icon fa fa-arrow-left"></i>
+                                                <div class="left-nav">
+                                                    <div class="nav-title">Previous</div>
+                                                    <div class="nav-content">Technical Goals</div>
+                                                </div>
+                                            </a>
+                                            <a class="link custom-nav" href="introduction-examples.html">
+                                                <div>
+                                                    <div class="nav-title">Next</div>
+                                                    <div class="nav-content">Examples</div>
+                                                </div>
+                                                <i class="icon fa fa-arrow-right"></i>
+                                            </a>
+
+                                        </div>
+
+                                    </div>
+                                </div><!--//row-->
+                            </div><!--//section-block-->
+
+                        </section><!--//doc-section-->
+
+                    </div><!--//content-inner-->
+                </div><!--//doc-content-->
+                <div class="doc-sidebar col-md-3 col-12 order-0 d-none d-md-flex">
+                    <div id="doc-nav" class="container doc-nav">
+                        <nav id="doc-menu" class="nav doc-menu flex-column sticky">
+                            <a class="nav-link" href="index.html">Read Me</a>
+
+                            <a class="nav-link" href="introduction.html">Introduction</a>
+                            <nav class="doc-sub-menu nav flex-column">
+                                <a class="nav-link" href="introduction-motivation.html">Motivation</a>
+                                <a class="nav-link" href="introduction-technical-goals.html">Technical Goals</a>
+                                <a class="nav-link" href="introduction-core-concepts.html">Core Concepts</a>
+                                <a class="nav-link" href="introduction-examples.html">Examples</a>
+                            </nav><!--//nav-->
+
+                            <a class="nav-link" href="basics.html">Basics</a>
+                            <nav class="doc-sub-menu nav flex-column">
+                                <a class="nav-link" href="basics-action-types.html">Action Types</a>
+                                <a class="nav-link" href="basics-action-creators.html">Action Creators</a>
+                                <a class="nav-link" href="basics-reducers.html">Reducers</a>
+                                <a class="nav-link" href="basics-selectors.html">Selectors</a>
+                                <a class="nav-link" href="basics-data-flow.html">Data Flow</a>
+                                <a class="nav-link" href="basics-examples.html">Examples</a>
+                            </nav><!--//nav-->
+
+                            <a class="nav-link" href="advanced.html">Advanced</a>
+                            <nav class="doc-sub-menu nav flex-column">
+                                <a class="nav-link" href="advanced-overriding-defaults.html">Overriding Defaults</a>
+                                <a class="nav-link" href="advanced-extending-defaults.html">Extending Defaults</a>
+                                <a class="nav-link" href="advanced-replacing-layers.html">Replacing Layers</a>
+                                <a class="nav-link" href="advanced-custom-error-handlers.html">Custom Error Handlers</a>
+                                <a class="nav-link" href="advanced-extending-defaults.html">Examples</a>
+                            </nav><!--//nav-->
+
+                            <a class="nav-link" href="#">Recipes</a>
+                            <a class="nav-link" href="#">API Reference</a>
+                            <a class="nav-link" href="#">Change Log</a>
+
+                        </nav><!--//doc-menu-->
+                    </div>
+                </div><!--//doc-sidebar-->
+            </div><!--//doc-body-->
+        </div><!--//container-->
+    </div><!--//doc-wrapper-->
+
+    <div id="promo-block" class="promo-block">
+        <div class="container">
+            <div class="promo-block-inner">
+                <h3 class="promo-title text-center"><i class="fas fa-heart"></i> <a href="https://themes.3rdwavemedia.com/bootstrap-templates/portfolio/instance-bootstrap-portfolio-theme-for-developers/" target="_blank">Are you an ambitious and entrepreneurial developer?</a></h3>
+                <div class="row">
+                    <div class="figure-holder col-lg-5 col-md-6 col-12">
+                        <div class="figure-holder-inner">
+                            <a href="https://themes.3rdwavemedia.com/bootstrap-templates/portfolio/instance-bootstrap-portfolio-theme-for-developers/" target="_blank"><img class="img-fluid" src="assets/images/demo/instance-promo.jpg" alt="Instance Theme" /></a>
+                            <a class="mask" href="https://themes.3rdwavemedia.com/bootstrap-templates/portfolio/instance-bootstrap-portfolio-theme-for-developers/"><i class="icon fa fa-heart pink"></i></a>
+
+                        </div>
+                    </div><!--//figure-holder-->
+                    <div class="content-holder col-lg-7 col-md-6 col-12">
+                        <div class="content-holder-inner">
+                            <div class="desc">
+                                <h4 class="content-title"><strong> Instance - Bootstrap 4 Portfolio Theme for Aspiring Developers</strong></h4>
+                                <p>Check out <a href="https://themes.3rdwavemedia.com/bootstrap-templates/portfolio/instance-bootstrap-portfolio-theme-for-developers/" target="_blank">Instance</a> - a Bootstrap personal portfolio theme I created for developers. The UX design is focused on selling a developer’s skills and experience to potential employers or clients, and has <strong class="highlight">all the winning ingredients to get you hired</strong>. It’s not only a HTML site template but also a marketing framework for you to <strong class="highlight">build an impressive online presence with a high conversion rate</strong>. </p>
+                                <p><strong class="highlight">[Tip for developers]:</strong> If your project is Open Source, you can use this area to promote your other projects or hold third party adverts like Bootstrap and FontAwesome do!</p>
+                                <a class="btn btn-cta" href="https://themes.3rdwavemedia.com/bootstrap-templates/portfolio/instance-bootstrap-portfolio-theme-for-developers/" target="_blank"><i class="fas fa-external-link-alt"></i> View Demo</a>
+
+                            </div><!--//desc-->
+
+
+                            <div class="author"><a href="https://themes.3rdwavemedia.com">Xiaoying Riley</a></div>
+                        </div><!--//content-holder-inner-->
+                    </div><!--//content-holder-->
+                </div><!--//row-->
+            </div><!--//promo-block-inner-->
+        </div><!--//container-->
+    </div><!--//promo-block-->
+
+</div><!--//page-wrapper-->
+
+<footer id="footer" class="footer text-center">
+    <div class="container">
+        <!--/* This template is released under the Creative Commons Attribution 3.0 License. Please keep the attribution link below when using for your own project. Thank you for your support. :) If you'd like to use the template without the attribution, you can buy the commercial license via our website: themes.3rdwavemedia.com */-->
+        <small class="copyright">Designed with <i class="fas fa-heart"></i> by <a href="https://themes.3rdwavemedia.com/" target="_blank">Xiaoying Riley</a> for developers</small>
+
+    </div><!--//container-->
+</footer><!--//footer-->
+
+
+<!-- Main Javascript -->
+<script type="text/javascript" src="assets/plugins/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="assets/plugins/prism/prism.js"></script>
+<script type="text/javascript" src="assets/plugins/jquery-scrollTo/jquery.scrollTo.min.js"></script>
+<script type="text/javascript" src="assets/plugins/stickyfill/dist/stickyfill.min.js"></script>
+<script type="text/javascript" src="assets/js/main.js"></script>
+
+</body>
+</html>
+

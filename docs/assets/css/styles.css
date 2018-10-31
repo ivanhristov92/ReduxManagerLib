@@ -1371,3 +1371,51 @@ select {
     padding: 30px 15px;
   }
 }
+
+
+/* CUSTOM CSS */
+.doc-nav {
+  position: relative;
+}
+
+.custom-nav-wrapper {
+  display: flex;
+  justify-content: center;
+  padding-top: 50px;
+}
+.custom-nav {
+  display: flex;
+  align-items: center;
+  width: 49%;
+  justify-content: space-between;
+  box-shadow: 0 3px 8px 0 rgba(116, 129, 141, 0.1);
+  border: 1px solid #E6ECF1;
+  border-radius: 3px;
+  padding: 16px;
+  color: #a2a6af
+}
+
+.custom-nav .left-nav{
+  text-align: right;
+}
+
+.custom-nav .nav-title, .custom-nav svg {
+  color: #9DAAB6;
+}
+
+.custom-nav .nav-content {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+code {
+  width: 100%;
+}
+
+.no-anchor-padding-list a{
+    padding: 0
+}
+
+.overflow-scroll {
+    overflow-x: scroll;
+}
