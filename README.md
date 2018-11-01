@@ -14,8 +14,8 @@ _ReduxManagerLib can be used with any Redux app, regardless of the view library 
 
 
 
-Check out this introductory wiki for more details and examples: 
-https://github.com/ivanhristov92/ReduxManagerLib/wiki/Introduction
+Check out the official documentation:
+http://aboriginal-joke.surge.sh
 
 Or go and see a more thorough example at this repo:
 https://github.com/ivanhristov92/ReduxManagerLibDemos
