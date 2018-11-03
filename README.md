@@ -1,6 +1,4 @@
 
-This is the documentation site for ReduxManagerLib. It is made with gatsby.
-
 # What is ReduxManagerLib?
 
 ReduxManagerLib is a runtime **generator of CRUD-ready data models** for **Redux**.

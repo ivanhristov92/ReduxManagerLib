@@ -36,9 +36,7 @@ const _thunkFactory = _.curry(function(
   );
 
   if (!restApiInstance[crudMethod]) {
-    throw new TypeError(
-      `"${actionTypeKey}" is not found in the restApi object`
-    );
+    throw new TypeError(`"${crudMethod}" is not found in the restApi object`);
   }
 
   return function crudThunk(payload) {

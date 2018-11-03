@@ -119,9 +119,13 @@ function failedCreateReadUpdateDelete(operation) {
 }
 
 function successfulDelete(state, action) {
+  let omit = Array.isArray(action.payload.ids)
+    ? action.payload.ids
+    : [action.payload.ids];
+
   return {
     ...state,
-    byId: _.omit([action.payload.id], state.byId),
+    byId: _.omit(omit, state.byId),
     delete: STATES.SUCCESS,
     error: null
   };

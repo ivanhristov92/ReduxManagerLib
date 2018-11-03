@@ -8,8 +8,12 @@ export { actionCreatorsFactory };
 export { reducerFactory };
 export { selectorsFactory };
 
-import { attachAnUnexpectedErrorLogger } from "./crud-error-types";
+import {
+  attachAnUnexpectedErrorLogger,
+  dispatchAnUnexpectedErrorEvent
+} from "./crud-error-types";
 export { attachAnUnexpectedErrorLogger };
+export { dispatchAnUnexpectedErrorEvent };
 
 import { bindSelectorsToState } from "./utils";
 export { bindSelectorsToState };
