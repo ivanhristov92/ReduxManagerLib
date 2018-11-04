@@ -312,7 +312,7 @@ describe("CRUD Rest Api", () => {
                 });
 
                 if (crudAct === "DELETE") {
-                  it(`The reducer should update the state 'byId' section on "DELETE__SUCCESS"`, () => {
+                  it(`The reducer should update the state 'byId' section on "DELETE__SUCCESS" - single id`, () => {
                     let crudAct = "DELETE__SUCCESS";
                     const action = {
                       type: mockActionTypes[crudAct],
@@ -323,6 +323,19 @@ describe("CRUD Rest Api", () => {
                       action
                     );
                     assert.deepEqual(state.byId, { a: 1 });
+                  });
+
+                  it(`The reducer should update the state 'byId' section on "DELETE__SUCCESS" - array of ids`, () => {
+                    let crudAct = "DELETE__SUCCESS";
+                    const action = {
+                      type: mockActionTypes[crudAct],
+                      payload: { ids: ["b", "a"] }
+                    };
+                    let state = reducer(
+                      { byId: { a: 1, b: 2, c: 3 }, isFetching: true },
+                      action
+                    );
+                    assert.deepEqual(state.byId, { c: 3 });
                   });
                 } else {
                   it(`The reducer should update the state 'byId' section on "${crudAct}__SUCCESS"`, () => {

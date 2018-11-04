@@ -121,7 +121,7 @@ function failedCreateReadUpdateDelete(operation) {
 function successfulDelete(state, action) {
   let omit = Array.isArray(action.payload.ids)
     ? action.payload.ids
-    : [action.payload.ids];
+    : [action.payload.id];
 
   return {
     ...state,
