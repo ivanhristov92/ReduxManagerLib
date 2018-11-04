@@ -1,8 +1,11 @@
+// @flow
 import * as _ from "ramda";
 import { ModuleInitializationTypeError } from "./crud-error-types";
 import { typeCheckOptions } from "./utils";
 
-export default function actionTypesFactory(modelName, options) {
+import type { RMLActionTypesFactory } from "./crud-action-types.flow";
+
+function actionTypesFactory(modelName, options) {
   if (typeof modelName !== "string" || modelName === "") {
     throw new ModuleInitializationTypeError(
       `'modelName' is required to be a non-empty string, instead got ${typeof modelName} : ${modelName}`
@@ -35,5 +38,9 @@ export default function actionTypesFactory(modelName, options) {
     actionTypes,
     options.additional || {}
   );
+
   return extendedActionTypes;
 }
+
+const module: RMLActionTypesFactory = actionTypesFactory;
+export default module;
