@@ -1,12 +1,9 @@
 import { ModuleInitializationTypeError } from "../crud-error-types";
+import { isObject, isNonEmptyString, isFunction } from "./type-checks";
 import * as _ from "ramda";
 
 export function bindSelectorsToState(subStateGetter, selectors) {
-  if (
-    (typeof subStateGetter !== "string" &&
-      typeof subStateGetter !== "function") ||
-    subStateGetter === ""
-  ) {
+  if (!isNonEmptyString(subStateGetter) && !isFunction(subStateGetter)) {
     throw new ModuleInitializationTypeError(
       `bindSelectorsToState expects a string or function as its 0th argument, intead it received ${typeof subStateGetter}: ${subStateGetter}`
     );
@@ -14,6 +11,12 @@ export function bindSelectorsToState(subStateGetter, selectors) {
 
   if (typeof subStateGetter === "string") {
     subStateGetter = _.prop(subStateGetter);
+  }
+
+  if (!isObject(selectors)) {
+    throw new ModuleInitializationTypeError(
+      `bindSelectorsToState expects an object as its 0th argument, intead it received ${typeof subStateGetter}: ${subStateGetter}`
+    );
   }
 
   const bind = sel => (...args) => {

@@ -37,7 +37,26 @@ describe("CRUD Action Creators", () => {
         });
       });
 
-      describe("[1] selectors", () => {});
+      describe("[1] selectors", () => {
+        it(`[ACCEPTS][CORRECT TYPE] an object`, () => {
+          assert.doesNotThrow(function() {
+            bindSelectorsToState("non-empty", {});
+          });
+        });
+
+        [[], "", null, false, true, 100, 0, function() {}, undefined].forEach(
+          (value, index) => {
+            it(`${index} [THROWS] throws a ModuleInitializationTypeError if 'selectors' is not an object, but ${typeof value} : ${value}`, () => {
+              try {
+                bindSelectorsToState(value, value);
+                throw new Error("should have thrown");
+              } catch (err) {
+                assert.equal(err.name, "ModuleInitializationTypeError");
+              }
+            });
+          }
+        );
+      });
     });
     describe("[RETURNS]", function() {});
   });

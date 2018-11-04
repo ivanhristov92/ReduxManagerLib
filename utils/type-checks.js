@@ -51,3 +51,9 @@ export function isOptionalObject(value) {
 export function isOptionalFunction(func) {
   return typeof func === "undefined" || typeof func === "function";
 }
+export function isNonEmptyString(value) {
+  return typeof value === "string" && value !== "";
+}
+export function isFunction(value) {
+  return typeof value === "function";
+}
