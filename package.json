@@ -4,7 +4,7 @@
   "description": "",
   "main": "model.js",
   "scripts": {
-    "test": "mocha --require babel-polyfill --require babel-register ./test/**/crud-reducer.js",
+    "test": "mocha --require babel-polyfill --require babel-register ./test/**/utils-bind-selectors-to-state.js",
     "testAll": "mocha --require babel-polyfill --require babel-register ./test/**"
   },
   "author": "",
