@@ -10,10 +10,19 @@ export { selectorsFactory };
 
 import {
   attachAnUnexpectedErrorLogger,
-  dispatchAnUnexpectedErrorEvent
+  dispatchAnUnexpectedErrorEvent,
+  ModuleInitializationTypeError
 } from "./crud-error-types";
 export { attachAnUnexpectedErrorLogger };
 export { dispatchAnUnexpectedErrorEvent };
+export { ModuleInitializationTypeError };
 
 import { bindSelectorsToState } from "./utils";
 export { bindSelectorsToState };
+
+import {
+  isOptionalObject,
+  isObject,
+  isOptionalFunction
+} from "./utils/type-checks";
+export { isOptionalObject, isObject, isOptionalFunction };
