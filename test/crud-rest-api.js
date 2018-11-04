@@ -42,6 +42,7 @@ describe("CRUD Rest Api", () => {
   });
 
   describe("[RUNTIME SIGNATURE]", () => {
+    /*
     describe("create", function() {
       describe("[RETURNS]", () => {
         describe("[CORRECT TYPE]", () => {
@@ -90,6 +91,7 @@ describe("CRUD Rest Api", () => {
         });
       });
     });
+    */
   });
 
   describe("[OPERATION]", () => {});
