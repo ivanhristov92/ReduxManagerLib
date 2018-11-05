@@ -1,3 +1,5 @@
+// @flow
+
 /*
  ** Contents
  ** --------
@@ -76,11 +78,9 @@ const _thunkFactory = _.curry(function(
 ////// ACTION CREATORS FACTORY //////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
-export default function actionCreatorsFactory(
-  _actionTypes,
-  _restApiInstance,
-  options
-) {
+import type { RMLActionCreatorsFacroty } from "./crud-action-creators.flow";
+
+function actionCreatorsFactory(_actionTypes, _restApiInstance, options) {
   if (!_actionTypes) {
     throw new ModuleInitializationTypeError(
       "'actionTypes' is required as an argument"
@@ -116,6 +116,9 @@ export default function actionCreatorsFactory(
 
   return Object.assign(actionCreators, options.additional || {});
 }
+
+const factory: RMLActionCreatorsFacroty = actionCreatorsFactory;
+export default factory;
 
 function typeCheckPromise(promise) {
   if (typeof promise !== "object" || typeof promise.then !== "function") {
