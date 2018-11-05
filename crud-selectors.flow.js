@@ -1,3 +1,5 @@
+// @flow
+
 import type { RMLState, RMLOperationStates } from "./crud-reducer.flow";
 
 export type RMLSelectorsFactoryOptions = {

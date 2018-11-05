@@ -1,8 +1,10 @@
+// @flow
+
 import { ModuleInitializationTypeError } from "../crud-error-types";
 
 export function typeCheckOptions(
-  options,
-  settings = { additionalContains: "functions" }
+  options: any,
+  settings: any = { additionalContains: "functions" }
 ) {
   if (!isOptionalObject(options)) {
     throw new ModuleInitializationTypeError(
@@ -40,20 +42,20 @@ export function typeCheckOptions(
 }
 
 // helpers
-export function isObject(value) {
+export function isObject(value: any): %checks {
   return typeof value === "object" && !Array.isArray(value) && value;
 }
 
-export function isOptionalObject(value) {
+export function isOptionalObject(value: any): %checks {
   return typeof value === "undefined" || isObject(value);
 }
 
-export function isOptionalFunction(func) {
-  return typeof func === "undefined" || typeof func === "function";
+export function isOptionalFunction(value: any): %checks {
+  return typeof value === "undefined" || typeof value === "function";
 }
-export function isNonEmptyString(value) {
+export function isNonEmptyString(value: any): %checks {
   return typeof value === "string" && value !== "";
 }
-export function isFunction(value) {
+export function isFunction(value: any): %checks {
   return typeof value === "function";
 }
