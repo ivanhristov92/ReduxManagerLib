@@ -1,6 +1,9 @@
-import { typeCheckOptions, defaultRuntimeErrorHandler } from "./utils";
+// @flow
 
-export default function selectorsFactory(options) {
+import { typeCheckOptions, defaultRuntimeErrorHandler } from "./utils";
+import { RMLSelectorsFactory } from "./crud-selectors.flow";
+
+function selectorsFactory(options) {
   typeCheckOptions(options);
 
   let runtimeErrorHandler =
@@ -87,6 +90,9 @@ export default function selectorsFactory(options) {
     additionalSelectors
   );
 }
+
+const factory: RMLSelectorsFactory = selectorsFactory;
+export default factory;
 
 function typeCheckState(state) {
   if (!isObject(state) || Object.keys(state).length === 0) {
