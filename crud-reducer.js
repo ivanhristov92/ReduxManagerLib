@@ -1,3 +1,5 @@
+// @flow
+
 import * as _ from "ramda";
 import {
   ModuleInitializationTypeError,
@@ -5,6 +7,8 @@ import {
 } from "./crud-error-types";
 
 import { typeCheckOptions, isObject, isOptionalObject } from "./utils";
+
+import type { RMLReducerFactory } from "./crud-reducer.flow";
 
 /////////////////////////////////////////////////////////////////////
 ////// REDUCER FACTORY //////////////////////////////////////////////
@@ -16,7 +20,7 @@ const STATES = {
   FAILURE: "FAILURE"
 };
 
-export default function reducerFactory(actionTypes, options) {
+function reducerFactory(actionTypes, options) {
   typeCheckActionTypes(actionTypes);
   typeCheckOptions(options);
   typeCheckDefaultState(options);
@@ -76,6 +80,9 @@ export default function reducerFactory(actionTypes, options) {
 
   return reducer;
 }
+
+const factory: RMLReducerFactory = reducerFactory;
+export default factory;
 
 /////////////////////////////////////////////////////////////////////
 ////// COMMON INTERNAL REDUCERS /////////////////////////////////////

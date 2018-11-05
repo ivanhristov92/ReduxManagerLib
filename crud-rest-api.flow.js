@@ -1,14 +1,16 @@
 export type NormalizedData = {
-  byId: {
-    [id: string | number]: any
-  }
+  [id: string | number]: any
+};
+
+export type RMLNormalizedDataInWrapper = {
+  byId: NormalizedData
 };
 
 export type RMLPayloadExpectedByRestClient = any;
 
 type RMLRestMethod =  (
     payload: RMLPayloadExpectedByRestClient
-) => Promise<NormalizedData | Error>,
+) => Promise<RMLNormalizedDataInWrapper | Error>,
 
 export type RMLRestClientInstance = {
   create: RMLRestMethod,
