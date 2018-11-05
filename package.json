@@ -1,6 +1,6 @@
 {
   "name": "redux-manager-lib",
-  "version": "1.0.1-16",
+  "version": "1.0.1-17",
   "description": "",
   "main": "./build/main.js",
   "scripts": {
