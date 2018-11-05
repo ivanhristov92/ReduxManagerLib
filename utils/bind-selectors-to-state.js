@@ -6,21 +6,32 @@ import * as _ from "ramda";
 
 import type { BindSelectorsToState } from "./bind-selectors-to-state.flow";
 
-function _bindSelectorsToState(_subStateGetter, selectors) {
-  let subStateGetter: Function;
-  if (isNonEmptyString(_subStateGetter)) {
-    subStateGetter = (_.prop(_subStateGetter): Function);
-  } else if (isFunction(_subStateGetter)) {
-    subStateGetter = _subStateGetter;
-  } else {
+function _bindSelectorsToState(subStateGetter, selectors) {
+  if (subStateGetter === null) {
     throw new ModuleInitializationTypeError(
-      `bindSelectorsToState expects a string or function as its 0th argument, intead it received ${typeof _subStateGetter}: ${_subStateGetter.toString()}`
+      `bindSelectorsToState expects a string or function as its 0th argument, instead it received ${typeof subStateGetter}: ${subStateGetter +
+        ""}`
     );
+  }
+  if (!isNonEmptyString(subStateGetter) && !isFunction(subStateGetter)) {
+    throw new ModuleInitializationTypeError(
+      `bindSelectorsToState expects a string or function as its 0th argument, instead it received ${typeof subStateGetter}: ${subStateGetter +
+        ""}`
+    );
+  } else {
+    console.log("subStateGetter", subStateGetter);
+  }
+
+  if (isNonEmptyString(subStateGetter)) {
+    subStateGetter = _.prop(subStateGetter);
+  } else if (isFunction(subStateGetter)) {
+    subStateGetter = subStateGetter;
   }
 
   if (!isObject(selectors)) {
     throw new ModuleInitializationTypeError(
-      `bindSelectorsToState expects an object as its 0th argument, intead it received ${typeof subStateGetter}: ${subStateGetter.toString()}`
+      `bindSelectorsToState expects an object as its 0th argument, instead it received ${typeof subStateGetter}: ${subStateGetter +
+        ""}`
     );
   }
 

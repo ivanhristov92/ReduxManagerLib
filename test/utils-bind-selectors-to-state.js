@@ -1,9 +1,8 @@
 import { bindSelectorsToState } from "../utils/bind-selectors-to-state";
-import actionCreatorsFactory from "../crud-action-creators";
 var assert = require("assert");
 var sinon = require("sinon");
 
-describe("CRUD Action Creators", () => {
+describe("UTILS bindSelectorsToState", () => {
   describe("[EXPORTS] a function", function() {
     it("The module should name export a function", () => {
       assert.equal(typeof bindSelectorsToState, "function");
