@@ -12,7 +12,10 @@ module.exports = {
   output: {
     // filename: `${commonPaths.jsFolder}/[name].[hash].js`,
     path: commonPaths.outputPath,
-    chunkFilename: "[name].[chunkhash].js"
+    chunkFilename: "[name].[chunkhash].js",
+    library: "ReduxManagerLib",
+    libraryTarget: "umd",
+    umdNamedDefine: true
   },
   module: {
     rules: [
