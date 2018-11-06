@@ -6,32 +6,24 @@ import * as _ from "ramda";
 
 import type { BindSelectorsToState } from "./bind-selectors-to-state.flow";
 
-function _bindSelectorsToState(subStateGetter, selectors) {
-  if (subStateGetter === null) {
-    throw new ModuleInitializationTypeError(
-      `bindSelectorsToState expects a string or function as its 0th argument, instead it received ${typeof subStateGetter}: ${subStateGetter +
-        ""}`
-    );
-  }
-  if (!isNonEmptyString(subStateGetter) && !isFunction(subStateGetter)) {
-    throw new ModuleInitializationTypeError(
-      `bindSelectorsToState expects a string or function as its 0th argument, instead it received ${typeof subStateGetter}: ${subStateGetter +
-        ""}`
-    );
+function _bindSelectorsToState(providedSubStateGetter, selectors) {
+  let subStateGetter;
+  if (isNonEmptyString(providedSubStateGetter)) {
+    subStateGetter = _.prop(providedSubStateGetter);
+  } else if (isFunction(providedSubStateGetter)) {
+    subStateGetter = providedSubStateGetter;
   } else {
-    console.log("subStateGetter", subStateGetter);
-  }
-
-  if (isNonEmptyString(subStateGetter)) {
-    subStateGetter = _.prop(subStateGetter);
-  } else if (isFunction(subStateGetter)) {
-    subStateGetter = subStateGetter;
+    throw new ModuleInitializationTypeError(
+      `bindSelectorsToState expects a string or function as its 0th argument, instead it received ${typeof providedSubStateGetter}: ${providedSubStateGetter}`
+    );
   }
 
   if (!isObject(selectors)) {
+    let stringified = isFunction(providedSubStateGetter)
+      ? providedSubStateGetter.toString()
+      : providedSubStateGetter;
     throw new ModuleInitializationTypeError(
-      `bindSelectorsToState expects an object as its 0th argument, instead it received ${typeof subStateGetter}: ${subStateGetter +
-        ""}`
+      `bindSelectorsToState expects an object as its 0th argument, instead it received ${typeof providedSubStateGetter}: ${stringified}`
     );
   }
 
