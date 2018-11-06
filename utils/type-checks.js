@@ -2,9 +2,22 @@
 
 import { ModuleInitializationTypeError } from "../crud-error-types";
 
+type Options =
+  | typeof undefined
+  | {
+      customErrorHandler?: Function,
+      additional?: {
+        [key: string]: string | Function
+      }
+    };
+
+type Settings = {
+  additionalContains?: "strings" | "functions"
+};
+
 export function typeCheckOptions(
-  options: any,
-  settings: any = { additionalContains: "functions" }
+  options?: Options,
+  settings: Settings = { additionalContains: "functions" }
 ) {
   if (!isOptionalObject(options)) {
     throw new ModuleInitializationTypeError(

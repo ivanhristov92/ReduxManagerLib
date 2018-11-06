@@ -18,7 +18,7 @@ export type RMLSelectors = {
     format: "map" | "list"
   ) => Array | Object,
   getError: (state: RMLState) => ?Object,
-  getOperationStates: (state: RMLState) => RMLOperationStates,
+  getOperationStates: (state: RMLState) => RMLOperationStates | {},
   [additionalSelector: string]: (Function) => any
 };
 

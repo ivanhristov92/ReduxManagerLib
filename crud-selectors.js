@@ -1,7 +1,8 @@
 // @flow
 
 import { typeCheckOptions, defaultRuntimeErrorHandler } from "./utils";
-import { RMLSelectorsFactory } from "./crud-selectors.flow";
+import type { RMLSelectorsFactory } from "./crud-selectors.flow";
+import type { RMLState } from "./crud-reducer.flow";
 
 function selectorsFactory(options) {
   typeCheckOptions(options);
@@ -60,7 +61,7 @@ function selectorsFactory(options) {
     }
   }
 
-  function getOperationStates(state) {
+  function getOperationStates(state: RMLState) {
     try {
       typeCheckState(state);
       return {
@@ -97,8 +98,7 @@ export default factory;
 function typeCheckState(state) {
   if (!isObject(state) || Object.keys(state).length === 0) {
     throw new TypeError(
-      `Expected state to be a valid State object, instead received ${typeof state}: ${"" +
-        state}`
+      `Expected state to be a valid State object, instead received ${typeof state}: ${state}`
     );
   }
   if (!isObject(state.byId)) {
