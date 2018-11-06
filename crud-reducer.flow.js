@@ -1,8 +1,8 @@
 // @flow
 
-import { RMLActionTypes } from "./crud-action-types.flow";
-import { RMLAction } from "./crud-action-creators.flow";
-import { NormalizedData } from "./crud-rest-api.flow";
+import type { RMLActionTypes } from "./crud-action-types.flow";
+import type { RMLAction } from "./crud-action-creators.flow";
+import type { NormalizedData } from "./crud-rest-api.flow";
 
 export type RMLOperationState = "IDLE" | "LOADING" | "SUCCESS" | "FAILURE";
 

@@ -2,7 +2,7 @@
 
 import { typeCheckOptions, defaultRuntimeErrorHandler } from "./utils";
 import type { RMLSelectorsFactory } from "./crud-selectors.flow";
-import type { RMLState } from "./crud-reducer.flow";
+import type { RMLOperationStates, RMLState } from "./crud-reducer.flow";
 
 function selectorsFactory(options) {
   typeCheckOptions(options);
@@ -64,17 +64,21 @@ function selectorsFactory(options) {
   function getOperationStates(state: RMLState) {
     try {
       typeCheckState(state);
-      return {
-        create: state.create,
-        read: state.read,
-        update: state.update,
+      let toReturn = {
+        create: typeof state.create,
+        read: typeof state.read,
+        update: typeof state.update,
         delete: state.delete
       };
+      return toReturn;
     } catch (error) {
-      runtimeErrorHandler(error, {
-        state,
-        selector: "getOperationStates"
-      });
+      try {
+        runtimeErrorHandler(error, {
+          state,
+          selector: "getOperationStates"
+        });
+      } catch (e) {}
+
       return {};
     }
   }
