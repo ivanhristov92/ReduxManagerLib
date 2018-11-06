@@ -57,7 +57,18 @@ describe("UTILS bindSelectorsToState", () => {
         );
       });
     });
-    describe("[RETURNS]", function() {});
+    describe("[RETURNS]", function() {
+      let regularSelectors = {
+        selector(state) {
+          return state.test;
+        }
+      };
+      let boundSelectors = bindSelectorsToState("testState", regularSelectors);
+
+      it("[CORRECT TYPE] object", () => {
+        assert.equal(typeof boundSelectors, "object");
+      });
+    });
   });
 
   describe("[OPERATION]", () => {});
