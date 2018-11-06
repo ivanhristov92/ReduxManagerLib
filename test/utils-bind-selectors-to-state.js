@@ -60,6 +60,9 @@ describe("UTILS bindSelectorsToState", () => {
     describe("[RETURNS]", function() {
       let regularSelectors = {
         selector(state) {
+          if (!state) {
+            throw new TypeError();
+          }
           return state.test;
         }
       };
@@ -68,8 +71,46 @@ describe("UTILS bindSelectorsToState", () => {
       it("[CORRECT TYPE] object", () => {
         assert.equal(typeof boundSelectors, "object");
       });
+
+      it("[CORRECT VALUE] has the selector", () => {
+        assert.equal(typeof boundSelectors.selector, "function");
+      });
     });
   });
 
-  describe("[OPERATION]", () => {});
+  describe("[OPERATION]", () => {
+    let state = { testState: { test: true } };
+
+    let regularSelectors = {
+      selector(state) {
+        if (!state.test) {
+          throw new TypeError();
+        }
+        return state.test;
+      },
+      nested: {
+        selector(state) {
+          if (!state.test) {
+            throw new TypeError();
+          }
+          return state.test;
+        }
+      }
+    };
+    let boundSelectors = bindSelectorsToState("testState", regularSelectors);
+
+    it("gets the state", () => {
+      assert.doesNotThrow(() => {
+        boundSelectors.selector(state);
+        boundSelectors.nested.selector(state);
+      }, Error);
+    });
+
+    it("returns the correct value", () => {
+      let value = boundSelectors.selector(state);
+      let valueFromNested = boundSelectors.nested.selector(state);
+      assert.equal(value, true);
+      assert.equal(valueFromNested, true);
+    });
+  });
 });
