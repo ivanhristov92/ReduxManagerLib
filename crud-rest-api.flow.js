@@ -18,6 +18,8 @@ export type RMLRestClientInstance = {
   create: RMLRestMethod,
   read: RMLRestMethod,
   update: RMLRestMethod,
-  delete: RMLRestMethod,
+  delete: (
+    payload: RMLPayloadExpectedByRestClient
+  ) => Promise<{ ids: Array<string | number> } | { id: string | number }>,
   [additionalMethod: string]: RMLRestMethod
 };
