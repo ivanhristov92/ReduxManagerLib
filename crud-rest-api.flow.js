@@ -1,3 +1,5 @@
+// @flow
+
 export type NormalizedData = {
   [id: string | number]: any
 };
@@ -8,9 +10,9 @@ export type RMLNormalizedDataInWrapper = {
 
 export type RMLPayloadExpectedByRestClient = any;
 
-type RMLRestMethod =  (
-    payload: RMLPayloadExpectedByRestClient
-) => Promise<RMLNormalizedDataInWrapper | Error>,
+type RMLRestMethod = (
+  payload: RMLPayloadExpectedByRestClient
+) => Promise<RMLNormalizedDataInWrapper | Error>;
 
 export type RMLRestClientInstance = {
   create: RMLRestMethod,

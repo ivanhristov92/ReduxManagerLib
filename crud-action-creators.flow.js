@@ -1,3 +1,5 @@
+// @flow
+
 import type { RMLActionTypes } from "./crud-action-types.flow";
 import type {
   RMLRestClientInstance,
