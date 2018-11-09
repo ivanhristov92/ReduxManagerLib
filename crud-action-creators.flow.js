@@ -2,7 +2,7 @@
 
 import type { RMLActionTypes } from "./crud-action-types.flow";
 import type {
-  RMLRestClientInstance,
+  RMLRestClient,
   RMLPayloadExpectedByRestClient
 } from "./crud-rest-api.flow";
 
@@ -33,6 +33,6 @@ export type RMLActionCreatorsOptions = {
 
 export type RMLActionCreatorsFacroty = (
   actionTypes: RMLActionTypes,
-  restClientInstance: RMLRestClientInstance,
+  restClientInstance: RMLRestClient,
   options?: RMLActionCreatorsOptions
 ) => RMLActionCreators;
