@@ -65,9 +65,9 @@ function selectorsFactory(options) {
     try {
       typeCheckState(state);
       let toReturn = {
-        create: typeof state.create,
-        read: typeof state.read,
-        update: typeof state.update,
+        create: state.create,
+        read: state.read,
+        update: state.update,
         delete: state.delete
       };
       return toReturn;
